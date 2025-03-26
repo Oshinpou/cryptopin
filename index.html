@@ -3,14 +3,14 @@
 <head>
   <link rel="stylesheet" type="text/css" href="styles.css">
   <link rel="icon" href="logo.png" type="image/png">
-  <title>Crypto Pin - Social Media Platform</title>
+  <title>Crypto Pin - Connect and Grow</title>
 </head>
 <body>
   <!-- Navigation Bar -->
   <div class="navbar">
     <div class="logo">
       <img src="logo.png" alt="Crypto Pin Logo" class="logo-img">
-      <h1>Crypto Pin</h1>
+      <h1 class="logo-text">Crypto Pin</h1>
     </div>
     <div class="burger-menu" onclick="toggleMenu()">☰</div>
   </div>
@@ -23,37 +23,45 @@
     <a href="#">Your Profile</a>
     <a href="#">Settings</a>
     <a href="#">Help Center</a>
-    <a href="#">Contact Us</a>
     <a href="#">About</a>
     <a href="#">Privacy Policy</a>
-    <a href="#">Terms & Conditions</a>
+    <a href="#">Contact Us</a>
   </div>
 
   <!-- Authentication Section -->
   <div class="auth-section">
     <div id="auth-buttons">
-      <button id="login-btn">Login</button>
-      <button id="signup-btn">Sign Up</button>
-      <button id="logout-btn" style="display: none;">Logout</button>
+      <button class="btn" id="login-btn">Login</button>
+      <button class="btn" id="signup-btn">Sign Up</button>
+      <button class="btn logout-btn" id="logout-btn" style="display: none;">Logout</button>
     </div>
-    <p id="welcome-user" style="display: none;"></p>
+    <p id="welcome-user" style="display: none;" class="welcome-msg"></p>
   </div>
 
   <!-- Main Content -->
   <div class="container">
-    <h2>Welcome to Crypto Pin</h2>
-    <p>Post, connect, and promote your content to millions of crypto enthusiasts.</p>
+    <h2>Welcome to <span class="highlight">Crypto Pin</span></h2>
+    <p>Share, connect, and grow in the world of cryptocurrency.</p>
 
-    <!-- Community Section -->
-    <div class="community-section">
-      <h3>Join the Community</h3>
-      <button class="community-btn">Explore Community</button>
-    </div>
+    <!-- Features Section -->
+    <div class="features">
+      <div class="feature-card">
+        <h3>🌟 Explore Community</h3>
+        <p>Engage with crypto experts and enthusiasts worldwide.</p>
+        <button class="btn">Join Now</button>
+      </div>
 
-    <!-- Chat Section -->
-    <div class="chat-section">
-      <h3>Chat with Crypto Experts</h3>
-      <button class="chat-btn">Open Chat</button>
+      <div class="feature-card">
+        <h3>💬 Chat & Discuss</h3>
+        <p>Connect with fellow investors and crypto lovers.</p>
+        <button class="btn">Start Chat</button>
+      </div>
+
+      <div class="feature-card">
+        <h3>📣 Promote Your Content</h3>
+        <p>Reach millions by promoting your crypto-related posts.</p>
+        <button class="btn">Promote Now</button>
+      </div>
     </div>
   </div>
 
