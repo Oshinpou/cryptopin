@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Admin Panel | CryptoPin</title>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Admin Panel - User Management</h1>
+        
+        <!-- Search Bar to Find User -->
+        <div class="search-container">
+            <input type="text" id="searchUser" placeholder="Search by username..." />
+            <button onclick="searchUser()">Search</button>
+        </div>
+        
+        <!-- Display User Info -->
+        <div id="user-info" class="hidden">
+            <h2>User Information</h2>
+            <p><strong>Username:</strong> <span id="user-username"></span></p>
+            <p><strong>Email:</strong> <span id="user-email"></span></p>
+            <p><strong>Password:</strong> <span id="user-password"></span></p>
+            
+            <!-- Delete Button -->
+            <button class="delete-btn" onclick="confirmDelete()">Delete Account</button>
+        </div>
+
+        <!-- Confirmation Modal for Deleting User -->
+        <div id="deleteModal" class="modal hidden">
+            <div class="modal-content">
+                <p>Are you sure you want to delete this account?</p>
+                <button onclick="deleteUser()">Yes, Delete</button>
+                <button onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
