@@ -97,10 +97,58 @@
             background-color: #f9f9f9;
             border-radius: 5px;
         }
+   
+    #searchSection {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#searchInput {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+#searchBtn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#searchBtn:hover {
+    background-color: #45a049;
+}
+
+#searchResults {
+    margin-top: 20px;
+    padding: 10px;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
     </style>
 </head>
 <body>
 
+    <!-- Search Bar Section -->
+    <div id="searchSection">
+        <input type="text" id="searchInput" placeholder="Search by username..." />
+        <button id="searchBtn" onclick="searchUser()">Search</button>
+        <div id="searchResults"></div>
+    </div>
+ 
     <div class="container">
         <!-- Display Logged-In Username -->
         <div class="username" id="loggedInUsername">Welcome, User</div>
@@ -328,6 +376,61 @@
                 window.location.href = 'signup-login.html'; // Redirect if not logged in
             }
         };
+   
+    // ===============================
+// Search Bar Section Functions
+// ===============================
+
+// Load registered usernames from Local CRM Storage
+function loadRegisteredUsers() {
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    return registeredUsers;
+}
+
+// Search User by Username
+function searchUser() {
+    const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
+    const registeredUsers = loadRegisteredUsers();
+    const searchResultsDiv = document.getElementById('searchResults');
+
+    if (searchInput === '') {
+        searchResultsDiv.innerHTML = '<p>Please enter a username to search.</p>';
+        return;
+    }
+
+    const matchedUser = registeredUsers.find(user => user.username.toLowerCase() === searchInput);
+
+    if (matchedUser) {
+        searchResultsDiv.innerHTML = `
+            <div>
+                <p><strong>Username:</strong> ${matchedUser.username}</p>
+                <button onclick="viewProfile('${matchedUser.username}')">View Profile</button>
+            </div>
+        `;
+    } else {
+        searchResultsDiv.innerHTML = '<p>No user found with that username.</p>';
+    }
+}
+
+// Redirect to View Profile as Visitor
+function viewProfile(username) {
+    localStorage.setItem('profileOwner', username);
+    window.location.href = 'dashboard.html'; // Redirect to the profile page as a visitor
+}
+
+// Store New Usernames in Local CRM Storage
+function storeRegisteredUser(username) {
+    let registeredUsers = loadRegisteredUsers();
+    
+    // Avoid duplicating usernames
+    if (!registeredUsers.some(user => user.username === username)) {
+        registeredUsers.push({ username });
+        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+    }
+}
+
+
+        
     </script>
 </body>
 </html>
