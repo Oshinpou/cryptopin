@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CryptoPin - Profile</title>
+    <link rel="stylesheet" type="text/css" href="css/profile.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <img src="media/cryptopin-logo.png" alt="CryptoPin" class="logo">
+        <button class="burger-menu" onclick="toggleMenu()">☰</button>
+    </div>
+
+    <!-- Burger Menu -->
+    <div id="menu" class="menu">
+        <a onclick="openSearch()">Search Username</a>
+        <a onclick="openCommunity()">Community</a>
+        <a onclick="promotePost()">Promote Posts</a>
+        <a onclick="logout()">Logout</a>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="profile-container">
+        <div class="profile-header">
+            <img id="profilePic" src="media/placeholder.png" alt="Profile Picture">
+            <input type="file" id="uploadProfilePic" accept="image/*" onchange="uploadProfilePic(event)">
+            <h2 id="username"></h2>
+            <p id="country"></p>
+            <p id="category"></p>
+        </div>
+
+        <div class="profile-info">
+            <p><strong>Bio:</strong> <span id="bio"></span></p>
+            <textarea id="editBio" placeholder="Update your bio..."></textarea>
+            <button onclick="updateBio()">Update Bio</button>
+            <div class="stats">
+                <p><strong>Followers:</strong> <span id="followers">0</span></p>
+                <p><strong>Following:</strong> <span id="following">0</span></p>
+                <p><strong>Total Posts:</strong> <span id="totalPosts">0</span></p>
+            </div>
+        </div>
+
+        <!-- Post Upload Section -->
+        <div class="post-upload">
+            <textarea id="postText" placeholder="Write something..."></textarea>
+            <input type="file" id="mediaUpload" accept="image/*, video/*" onchange="uploadMedia(event)">
+            <button onclick="createPost()">Upload Post</button>
+        </div>
+
+        <!-- Post Display Section -->
+        <div id="postContainer"></div>
+    </div>
+
+    <script src="js/profile.js"></script>
+    <script src="js/post.js"></script>
+</body>
+</html>
