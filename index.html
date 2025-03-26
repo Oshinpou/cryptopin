@@ -1,87 +1,327 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Pin - Social Platform</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Crypto Pin - Social Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 30px;
+            background: #1a1a1a;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ffcc;
+        }
+
+        .menu-btn {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        nav a:hover {
+            background: #00ffcc;
+        }
+
+        /* Burger Menu for Small Screens */
+        .menu {
+            display: none;
+            flex-direction: column;
+            background: #1a1a1a;
+            position: absolute;
+            top: 60px;
+            right: 30px;
+            width: 200px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+        }
+
+        .menu a {
+            padding: 12px 16px;
+            border-bottom: 1px solid #333;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+            }
+
+            .menu-btn {
+                display: block;
+            }
+
+            .menu {
+                display: none;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            background: linear-gradient(135deg, #1e1e1e, #333333);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            color: #00ffcc;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 20px;
+            margin-top: 20px;
+            background: #00ffcc;
+            color: #0f0f0f;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #00cca3;
+        }
+
+        /* Features Section */
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 50px 20px;
+            background: #121212;
+        }
+
+        .feature-card {
+            width: 250px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        /* Posts Section */
+        .posts {
+            padding: 50px 20px;
+            background: #1a1a1a;
+        }
+
+        .post-card {
+            background: #333;
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Chat Section */
+        .chat-box {
+            background: #121212;
+            padding: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .chat-messages {
+            height: 150px;
+            overflow-y: auto;
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 15px;
+            background: #1a1a1a;
+            text-align: center;
+            color: #aaa;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
+
 <body>
-
-    <!-- Navbar with Burger Menu -->
-    <nav class="navbar">
-        <div class="container">
-            <h1 class="logo">Crypto Pin</h1>
-            <button class="burger" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <ul id="navMenu" class="nav-links">
-                <li><a href="#" onclick="showSection('home')">Home</a></li>
-                <li><a href="#" onclick="showSection('community')">Community</a></li>
-                <li><a href="#" onclick="showSection('profile')">Profile</a></li>
-                <li><a href="#" onclick="showSection('chat')">Chat</a></li>
-                <li><a href="#" onclick="showSection('notifications')">Notifications</a></li>
-                <li><a href="#" id="authButton" onclick="openAuthPopup()">Login / Signup</a></li>
-                <li><a href="#" id="logoutBtn" onclick="logout()" style="display: none;">Logout</a></li>
-            </ul>
+    <header>
+        <div class="logo">Crypto Pin</div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Community</a>
+            <a href="#">Notifications</a>
+            <a href="#">Profile</a>
+        </nav>
+        <div class="menu-btn" onclick="toggleMenu()">☰</div>
+        <div class="menu" id="menu">
+            <a href="#">Home</a>
+            <a href="#">Community</a>
+            <a href="#">Notifications</a>
+            <a href="#">Profile</a>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="section active">
-        <div class="hero-content">
-            <h2>Welcome to Crypto Pin</h2>
-            <p>Explore, Share, and Engage with the Crypto Community.</p>
-            <a href="#" class="btn explore-btn" onclick="showSection('community')">Explore Community</a>
-        </div>
-    </section>
-
-    <!-- Community Section -->
-    <section id="community" class="section">
-        <h3>Community Posts</h3>
-        <div id="posts" class="post-grid"></div>
-    </section>
-
-    <!-- Profile Section -->
-    <section id="profile" class="section">
-        <h3>Your Profile</h3>
-        <div id="profileContent"></div>
-    </section>
-
-    <!-- Chat Section -->
-    <section id="chat" class="section">
-        <h3>Chat with Community</h3>
-        <div id="chatBox">
-            <input type="text" id="chatInput" placeholder="Type a message...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
-        <div id="chatMessages"></div>
-    </section>
-
-    <!-- Notifications Section -->
-    <section id="notifications" class="section">
-        <h3>Notifications</h3>
-        <ul id="notificationList"></ul>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Crypto Pin. All rights reserved.</p>
-    </footer>
-
-    <!-- Auth Popup -->
-    <div id="authPopup" class="popup">
-        <div class="popup-content">
-            <span class="close-btn" onclick="closeAuthPopup()">&times;</span>
-            <h3 id="authTitle">Login / Signup</h3>
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button onclick="authenticate()">Submit</button>
+    <div class="hero">
+        <div>
+            <h1>Explore the Crypto World</h1>
+            <button class="btn" onclick="showAuthPopup()">Login / Sign Up</button>
         </div>
     </div>
 
-    <script src="js/script.js"></script>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="feature-card">
+            <h3>🔗 Post & Engage</h3>
+            <p>Share posts, comments, and engage with others.</p>
+        </div>
+        <div class="feature-card">
+            <h3>📣 Promote</h3>
+            <p>Promote posts with crypto payments.</p>
+        </div>
+        <div class="feature-card">
+            <h3>💬 Chat</h3>
+            <p>Connect with crypto enthusiasts worldwide.</p>
+        </div>
+    </section>
+
+    <!-- Posts Section -->
+    <section class="posts" id="posts">
+        <h2 style="text-align: center;">🔥 Trending Posts</h2>
+        <div class="post-card">
+            <h4>@cryptoKing</h4>
+            <p>🚀 Bitcoin is pumping again!</p>
+        </div>
+    </section>
+
+    <!-- Chat Section -->
+    <div class="chat-box">
+        <h3>💬 Chat Box</h3>
+        <div class="chat-messages" id="chatMessages"></div>
+        <input type="text" id="chatInput" placeholder="Type a message...">
+        <button class="btn" onclick="sendMessage()">Send</button>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Crypto Pin. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript Section -->
+    <script>
+        // Toggle Burger Menu
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Show Auth Popup
+        function showAuthPopup() {
+            const username = prompt("Enter Username:");
+            const email = prompt("Enter Email:");
+            const password = prompt("Enter Password:");
+
+            if (username && email && password) {
+                const user = {
+                    username: username,
+                    email: email,
+                    points: 0
+                };
+                localStorage.setItem('loggedInUser', JSON.stringify(user));
+                alert(`✅ Welcome, ${username}!`);
+            } else {
+                alert("⚠️ Please fill all fields!");
+            }
+        }
+
+        // Send Chat Message
+        function sendMessage() {
+            const message = document.getElementById('chatInput').value;
+            if (message.trim() === '') return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+            document.getElementById('chatInput').value = '';
+        }
+
+        // Generate Dummy Posts
+        function generatePosts() {
+            const posts = [
+                { username: "cryptoKing", content: "🚀 Bitcoin is pumping again!" },
+                { username: "blockQueen", content: "📢 Ethereum Merge is coming!" },
+                { username: "hodlMaster", content: "💎 Hold on tight! We’re mooning!" },
+                { username: "altFreak", content: "🌕 Altseason is here!" }
+            ];
+
+            let postHTML = '';
+            posts.forEach(post => {
+                postHTML += `
+                    <div class="post-card">
+                        <h4>@${post.username}</h4>
+                        <p>${post.content}</p>
+                    </div>
+                `;
+            });
+            document.getElementById('posts').innerHTML = postHTML;
+        }
+
+        // Load Posts on Page Load
+        document.addEventListener('DOMContentLoaded', () => {
+            generatePosts();
+        });
+    </script>
 </body>
+
 </html>
