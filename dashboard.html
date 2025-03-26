@@ -3,7 +3,8 @@
 <head>
     <title>Dashboard - CryptoPin Social</title>
     <meta name="google-adsense-account" content="ca-pub-1204724319985727">
-    <style>
+    <link rel="stylesheet" type="text/css" href="bio.css">
+<style>
         body {
             margin: 0;
             padding: 0;
@@ -88,6 +89,19 @@
         <button id="uploadBtn" class="profile-btn hidden-for-visitors" onclick="document.getElementById('profileUpload').click()">Upload Photo</button>
         <button id="updateBtn" class="profile-btn hidden-for-visitors" onclick="updateProfilePic()">Update Photo</button>
     </div>
+
+   
+
+    <!-- Bio Section -->
+    <div id="bioSection">
+        <textarea id="bioText" rows="15" cols="50" maxlength="1500" placeholder="Write your bio here (up to 15 lines)..."></textarea>
+        <br>
+        <button id="uploadBioBtn" class="profile-btn hidden-for-visitors" onclick="uploadBio()">Upload Bio</button>
+        <button id="updateBioBtn" class="profile-btn hidden-for-visitors" onclick="updateBio()">Update Bio</button>
+        <div id="bioDisplay"></div>
+    </div>
+
+    <script src="bio.js"></script>
 
     <script>
         // Load Logged-In User from Local Storage
