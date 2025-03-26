@@ -1,0 +1,26 @@
+{
+  "users": [
+    {
+      "username": "john_doe",
+      "password": "1234",
+      "country": "USA",
+      "category": "Bitcoin",
+      "profilePic": "data:image/png;base64,...",
+      "bio": "Crypto Enthusiast | Blockchain Lover",
+      "followers": 100,
+      "following": 50,
+      "posts": [
+        {
+          "id": 1711853200000,
+          "text": "Hello Crypto World!",
+          "media": "data:image/jpeg;base64,...",
+          "likes": 10,
+          "comments": [],
+          "pinned": false,
+          "uniqueCode": "CP-1711853200000"
+        }
+      ]
+    }
+  ],
+  "loggedInUser": "john_doe"
+}
