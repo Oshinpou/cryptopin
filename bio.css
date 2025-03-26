@@ -1,0 +1,47 @@
+/* Bio Section Styles */
+#bioSection {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#bioText {
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    resize: none;
+}
+
+#bioDisplay {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    width: 100%;
+    max-width: 600px;
+    text-align: left;
+    white-space: pre-line;
+}
+
+.profile-btn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.profile-btn:hover {
+    background-color: #45a049;
+}
+
+/* Hide Buttons for Visitors */
+.hidden-for-visitors {
+    display: none;
+}
