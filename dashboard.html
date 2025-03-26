@@ -3,8 +3,7 @@
 <head>
     <title>Dashboard - CryptoPin Social</title>
     <meta name="google-adsense-account" content="ca-pub-1204724319985727">
-    <link rel="stylesheet" type="text/css" href="bio.css">
-<style>
+    <style>
         body {
             margin: 0;
             padding: 0;
@@ -17,57 +16,69 @@
         }
         .container {
             width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
+            max-width: 800px;
+            margin: 20px;
+            text-align: center;
         }
         .username {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: #262626;
+            margin-bottom: 10px;
         }
-        .logout-btn {
-            background-color: #ff4d4d;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .logout-btn:hover {
-            background-color: #e04343;
-        }
-        /* Profile Section */
-        #profileSection {
-            text-align: center;
-            margin-top: 20px;
-        }
-        #profilePic {
+        #profilePicture {
             width: 150px;
             height: 150px;
             border-radius: 50%;
+            border: 3px solid #ccc;
             object-fit: cover;
-            border: 2px solid #ccc;
-        }
-        .hidden-btn {
-            display: none;
+            margin-top: 10px;
         }
         .profile-btn {
-            margin-top: 10px;
-            padding: 10px 15px;
             background-color: #4CAF50;
             color: white;
             border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
             border-radius: 5px;
             cursor: pointer;
         }
         .profile-btn:hover {
             background-color: #45a049;
         }
-        /* Hide Buttons for Visitors */
         .hidden-for-visitors {
             display: none;
+        }
+        #bioSection, #profileSection {
+            margin-top: 20px;
+        }
+        #bioText {
+            width: 100%;
+            max-width: 600px;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: none;
+        }
+        #bioDisplay {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            width: 100%;
+            max-width: 600px;
+            text-align: left;
+            white-space: pre-line;
+        }
+        #logoutBtn {
+            background-color: #ff4d4d;
+            margin-top: 20px;
+        }
+        #logoutBtn:hover {
+            background-color: #e04343;
         }
     </style>
 </head>
@@ -77,94 +88,109 @@
         <!-- Display Logged-In Username -->
         <div class="username" id="loggedInUsername">Welcome, User</div>
 
+        <!-- Profile Section -->
+        <div id="profileSection">
+            <img id="profilePicture" src="default-profile.jpg" alt="Profile Picture">
+            <input type="file" id="uploadProfileBtn" class="profile-btn hidden-for-visitors" accept="image/*" onchange="uploadProfile()">
+        </div>
+
+        <!-- Bio Section -->
+        <div id="bioSection">
+            <textarea id="bioText" rows="15" cols="50" maxlength="1500" placeholder="Write your bio here (up to 15 lines)..."></textarea>
+            <br>
+            <button id="uploadBioBtn" class="profile-btn hidden-for-visitors" onclick="uploadBio()">Upload Bio</button>
+            <button id="updateBioBtn" class="profile-btn hidden-for-visitors" onclick="updateBio()">Update Bio</button>
+            <div id="bioDisplay">No bio added yet.</div>
+        </div>
+
         <!-- Logout Button -->
-        <button class="logout-btn" id="logoutBtn" onclick="logout()">Logout</button>
+        <button id="logoutBtn" class="profile-btn hidden-for-visitors" onclick="logout()">Logout</button>
     </div>
-
-    <!-- Profile Section -->
-    <div id="profileSection">
-        <img id="profilePic" src="default-profile.png" alt="Profile Picture">
-        <br>
-        <input type="file" id="profileUpload" accept="image/*" class="hidden-btn" onchange="uploadProfilePic()">
-        <button id="uploadBtn" class="profile-btn hidden-for-visitors" onclick="document.getElementById('profileUpload').click()">Upload Photo</button>
-        <button id="updateBtn" class="profile-btn hidden-for-visitors" onclick="updateProfilePic()">Update Photo</button>
-    </div>
-
-   
-
-    <!-- Bio Section -->
-    <div id="bioSection">
-        <textarea id="bioText" rows="15" cols="50" maxlength="1500" placeholder="Write your bio here (up to 15 lines)..."></textarea>
-        <br>
-        <button id="uploadBioBtn" class="profile-btn hidden-for-visitors" onclick="uploadBio()">Upload Bio</button>
-        <button id="updateBioBtn" class="profile-btn hidden-for-visitors" onclick="updateBio()">Update Bio</button>
-        <div id="bioDisplay"></div>
-    </div>
-
-    <script src="bio.js"></script>
 
     <script>
         // Load Logged-In User from Local Storage
         const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        const profileOwner = new URLSearchParams(window.location.search).get('username') || loggedInUser?.username;
 
-        // Check if User is Logged In
-        if (loggedInUser) {
-            document.getElementById('loggedInUsername').innerText = `Welcome, ${loggedInUser.username}`;
-            loadProfilePic(loggedInUser.username);
+        // Check if logged in
+        if (!loggedInUser) {
+            window.location.href = 'signup-login.html';  // Redirect to login if not logged in
         } else {
-            // Redirect to login.html if no user is logged in
-            window.location.href = 'signup-login.html';
+            document.getElementById('loggedInUsername').innerText = `Welcome, ${loggedInUser.username}`;
         }
 
-        // Logout Function
-        function logout() {
-            localStorage.removeItem('loggedInUser');
-            window.location.href = 'signup-login.html';
+        // Hide Buttons for Visitors
+        if (profileOwner !== loggedInUser.username) {
+            document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
+                btn.style.display = 'none';
+            });
+            document.getElementById('bioText').style.display = 'none';
         }
 
-        // Upload Profile Picture and Save to Local CRM
-        function uploadProfilePic() {
-            const fileInput = document.getElementById('profileUpload');
+        // Load Profile Picture
+        function loadProfilePicture(username) {
+            const storedImage = localStorage.getItem(`profilePic_${username}`);
+            if (storedImage) {
+                document.getElementById('profilePicture').src = storedImage;
+            }
+        }
+
+        // Upload Profile Picture
+        function uploadProfile() {
+            const fileInput = document.getElementById('uploadProfileBtn');
             const file = fileInput.files[0];
-
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     localStorage.setItem(`profilePic_${loggedInUser.username}`, e.target.result);
-                    document.getElementById('profilePic').src = e.target.result;
+                    document.getElementById('profilePicture').src = e.target.result;
+                    alert('Profile picture uploaded successfully!');
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // Update Profile Picture Confirmation
-        function updateProfilePic() {
-            alert('Profile picture updated successfully!');
-        }
-
-        // Load Profile Picture from Local CRM Storage
-        function loadProfilePic(username) {
-            const storedPic = localStorage.getItem(`profilePic_${username}`);
-            if (storedPic) {
-                document.getElementById('profilePic').src = storedPic;
+        // Load Bio
+        function loadBio(username) {
+            const storedBio = localStorage.getItem(`bio_${username}`);
+            if (storedBio) {
+                document.getElementById('bioDisplay').innerText = storedBio;
             }
         }
 
-        // Hide Buttons for Outcomers/Visitors
-        const urlParams = new URLSearchParams(window.location.search);
-        const profileOwner = urlParams.get('user');
-
-        if (profileOwner && profileOwner !== loggedInUser.username) {
-            document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
-                btn.style.display = 'none';
-            });
-            document.getElementById('logoutBtn').style.display = 'none';
-        } else {
-            // Show Buttons Only for Logged-In User
-            document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
-                btn.style.display = 'inline-block';
-            });
+        // Upload Bio
+        function uploadBio() {
+            const bioContent = document.getElementById('bioText').value.trim();
+            if (bioContent === '') {
+                alert('Bio cannot be empty!');
+                return;
+            }
+            localStorage.setItem(`bio_${loggedInUser.username}`, bioContent);
+            document.getElementById('bioDisplay').innerText = bioContent;
+            alert('Bio uploaded successfully!');
         }
+
+        // Update Bio
+        function updateBio() {
+            const bioContent = document.getElementById('bioText').value.trim();
+            if (bioContent === '') {
+                alert('Bio cannot be empty!');
+                return;
+            }
+            localStorage.setItem(`bio_${loggedInUser.username}`, bioContent);
+            document.getElementById('bioDisplay').innerText = bioContent;
+            alert('Bio updated successfully!');
+        }
+
+        // Logout User
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'signup-login.html';
+        }
+
+        // Initial Load
+        loadProfilePicture(profileOwner);
+        loadBio(profileOwner);
     </script>
 
 </body>
