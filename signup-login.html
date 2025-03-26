@@ -1,58 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Pin - Sign Up / Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Login / Sign Up - CryptoPin Social Login</title>
+    <meta name="google-adsense-account" content="ca-pub-1204724319985727">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #fafafa;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 350px;
+        }
+        .form-container {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #dbdbdb;
+            border-radius: 5px;
+            text-align: center;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #262626;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #dbdbdb;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #3897f0;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+        .error-msg {
+            color: #ff4d4d;
+            margin-top: 10px;
+        }
+        .link {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .link a {
+            color: #3897f0;
+            text-decoration: none;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
-
 <body>
-    <div class="auth-container">
-        <div class="form-container" id="form-container">
-            <h2 id="form-title">Sign Up</h2>
 
-            <!-- Signup/Login Form -->
-            <form id="auth-form">
-                <div class="input-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" placeholder="Enter Username" required>
-                </div>
+    <div class="container">
+        <div class="form-container">
+            <h2>CryptoPin Social Login</h2>
 
-                <div class="input-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" placeholder="Enter Email" required>
-                </div>
-
-                <div class="input-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" placeholder="Enter Password" required>
-                </div>
-
-                <button type="submit" id="auth-btn">Sign Up</button>
-                <p class="switch-form">
-                    Already have an account? <a href="#" id="switch-to-login">Login</a>
-                </p>
+            <!-- Sign Up Form -->
+            <form id="signupForm">
+                <h3>Sign Up</h3>
+                <input type="text" id="signupUsername" placeholder="Enter Username" required>
+                <input type="email" id="signupEmail" placeholder="Enter Email" required>
+                <input type="password" id="signupPassword" placeholder="Enter Password" required>
+                <button type="button" onclick="signUp()">Sign Up</button>
             </form>
 
-            <!-- Forgot Password / Account Recovery -->
-            <div class="extra-options">
-                <a href="#" id="forgot-password">Forgot Password?</a>
-                <a href="#" id="delete-account">Delete Account</a>
+            <!-- Login Form -->
+            <form id="loginForm">
+                <h3>Login</h3>
+                <input type="text" id="loginUsername" placeholder="Enter Username or Email" required>
+                <input type="password" id="loginPassword" placeholder="Enter Password" required>
+                <button type="button" onclick="login()">Login</button>
+            </form>
+
+            <div id="error" class="error-msg"></div>
+            
+            <div class="link">
+                <a href="#" onclick="forgotPassword()">Forgot Password?</a> | 
+                <a href="#" onclick="deleteAccountRequest()">Delete Account</a>
             </div>
         </div>
     </div>
 
-    <!-- Admin Panel for CRM -->
-    <div class="admin-container" id="admin-container">
-        <h2>Admin Panel</h2>
-        <input type="text" id="search-user" placeholder="Search by Username">
-        <button onclick="searchUser()">Search</button>
-        <div id="user-details"></div>
-    </div>
+    <script>
+        // Load existing users and requests from local storage
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let requests = JSON.parse(localStorage.getItem('requests')) || [];
 
-    <script src="auth.js"></script>
+        // Sign Up Function
+        function signUp() {
+            const username = document.getElementById('signupUsername').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            
+            if (!username || !email || !password) {
+                alert('⚠️ All fields are required!');
+                return;
+            }
+
+            if (users.find(user => user.username === username || user.email === email)) {
+                alert('⚠️ Username or Email already exists.');
+                return;
+            }
+            
+            // Create a new user
+            users.push({ username, email, password });
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('✅ Sign Up Successful! You can now log in.');
+        }
+
+        // Login Function
+        function login() {
+            const usernameOrEmail = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            if (!usernameOrEmail || !password) {
+                alert('⚠️ Both fields are required!');
+                return;
+            }
+
+            const user = users.find(u => 
+                (u.username === usernameOrEmail || u.email === usernameOrEmail) && 
+                u.password === password
+            );
+
+            if (!user) {
+                document.getElementById("error").innerText = "❌ Invalid username/email or password.";
+                return;
+            }
+
+            // Store logged-in user details
+            localStorage.setItem('loggedInUser', JSON.stringify(user));
+
+            // Redirect to dashboard.html after login
+            window.location.href = "dashboard.html";
+        }
+
+        // Forgot Password Request
+        function forgotPassword() {
+            const username = prompt('Enter your username:');
+            const email = prompt('Enter your email:');
+            
+            if (!username || !email) {
+                alert('⚠️ Both fields are required!');
+                return;
+            }
+
+            requests.push({ username, email, type: 'recover' });
+            localStorage.setItem('requests', JSON.stringify(requests));
+            alert('📧 Recovery request sent. Action will be taken within 24 hours.');
+        }
+
+        // Delete Account Request
+        function deleteAccountRequest() {
+            const username = prompt('Enter your username:');
+            const email = prompt('Enter your email:');
+
+            if (!username || !email) {
+                alert('⚠️ Both fields are required!');
+                return;
+            }
+
+            requests.push({ username, email, type: 'delete' });
+            localStorage.setItem('requests', JSON.stringify(requests));
+            alert('🗑️ Delete request submitted.');
+        }
+    </script>
 </body>
-
 </html>
