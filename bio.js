@@ -1,4 +1,15 @@
-// Load Bio from Local CRM Storage
+// Get Logged-In User from Local Storage
+const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+// Load Bio on Page Load
+if (loggedInUser) {
+    loadBio(loggedInUser.username);
+} else {
+    // Redirect to login page if not logged in
+    window.location.href = 'signup-login.html';
+}
+
+// Load Bio from Local Storage by Username
 function loadBio(username) {
     const storedBio = localStorage.getItem(`bio_${username}`);
     if (storedBio) {
@@ -20,7 +31,7 @@ function uploadBio() {
     alert('Bio uploaded successfully!');
 }
 
-// Update Bio Confirmation
+// Update Bio and Save to Local Storage
 function updateBio() {
     const bioContent = document.getElementById('bioText').value.trim();
     if (bioContent === '') {
@@ -32,12 +43,10 @@ function updateBio() {
     alert('Bio updated successfully!');
 }
 
-// Hide Bio Buttons for Visitors
+// Hide Buttons for Visitors
 if (typeof profileOwner !== 'undefined' && profileOwner !== loggedInUser.username) {
     document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
         btn.style.display = 'none';
     });
     document.getElementById('bioText').style.display = 'none';
-} else {
-    loadBio(loggedInUser.username);
 }
