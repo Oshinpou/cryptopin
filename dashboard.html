@@ -58,13 +58,13 @@
             document.getElementById('loggedInUsername').innerText = `Welcome, ${loggedInUser.username}`;
         } else {
             // Redirect to login.html if no user is logged in
-            window.location.href = 'login.html';
+            window.location.href = 'signup-login.html';
         }
 
         // Logout Function
         function logout() {
             localStorage.removeItem('loggedInUser');
-            window.location.href = 'login.html';
+            window.location.href = 'signup-login.html';
         }
     </script>
 
