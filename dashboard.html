@@ -119,12 +119,21 @@
             document.getElementById('loggedInUsername').innerText = `Welcome, ${loggedInUser.username}`;
         }
 
-        // Hide Buttons for Visitors
-        if (profileOwner !== loggedInUser.username) {
-            document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
-                btn.style.display = 'none';
-            });
-            document.getElementById('bioText').style.display = 'none';
+        // Show or Hide Buttons Based on Ownership
+        function toggleVisitorMode() {
+            if (profileOwner === loggedInUser.username) {
+                // Show buttons for profile owner
+                document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
+                    btn.style.display = 'inline-block';
+                });
+                document.getElementById('bioText').style.display = 'block';
+            } else {
+                // Hide buttons for visitors
+                document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
+                    btn.style.display = 'none';
+                });
+                document.getElementById('bioText').style.display = 'none';
+            }
         }
 
         // Load Profile Picture
@@ -155,6 +164,8 @@
             const storedBio = localStorage.getItem(`bio_${username}`);
             if (storedBio) {
                 document.getElementById('bioDisplay').innerText = storedBio;
+            } else {
+                document.getElementById('bioDisplay').innerText = "No bio added yet.";
             }
         }
 
@@ -188,9 +199,10 @@
             window.location.href = 'signup-login.html';
         }
 
-        // Initial Load
+        // Initial Load Actions
         loadProfilePicture(profileOwner);
         loadBio(profileOwner);
+        toggleVisitorMode();
     </script>
 
 </body>
