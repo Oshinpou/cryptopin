@@ -34,7 +34,7 @@
             object-fit: cover;
             margin-top: 10px;
         }
-        .profile-btn {
+        .profile-btn, .follow-btn {
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -43,7 +43,7 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .profile-btn:hover {
+        .profile-btn:hover, .follow-btn:hover {
             background-color: #45a049;
         }
         .hidden-for-visitors {
@@ -80,6 +80,23 @@
         #logoutBtn:hover {
             background-color: #e04343;
         }
+        #followSection, #followerSection, #followingSection {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .profile-list {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -94,6 +111,14 @@
             <input type="file" id="uploadProfileBtn" class="profile-btn hidden-for-visitors" accept="image/*" onchange="uploadProfile()">
         </div>
 
+        <!-- Follow Button for Visitors -->
+        <button id="followBtn" class="follow-btn" onclick="toggleFollow()">Follow</button>
+
+        <!-- Following & Followers Count -->
+        <div id="followSection">
+            <div class="section-title">Following: <span id="followingCount">0</span> | Followers: <span id="followerCount">0</span></div>
+        </div>
+
         <!-- Bio Section -->
         <div id="bioSection">
             <textarea id="bioText" rows="15" cols="50" maxlength="1500" placeholder="Write your bio here (up to 15 lines)..."></textarea>
@@ -101,6 +126,18 @@
             <button id="uploadBioBtn" class="profile-btn hidden-for-visitors" onclick="uploadBio()">Upload Bio</button>
             <button id="updateBioBtn" class="profile-btn hidden-for-visitors" onclick="updateBio()">Update Bio</button>
             <div id="bioDisplay">No bio added yet.</div>
+        </div>
+
+        <!-- Following Profiles -->
+        <div id="followingSection">
+            <div class="section-title">Following:</div>
+            <div id="followingList" class="profile-list">No following yet.</div>
+        </div>
+
+        <!-- Followers Profiles -->
+        <div id="followerSection">
+            <div class="section-title">Followers:</div>
+            <div id="followerList" class="profile-list">No followers yet.</div>
         </div>
 
         <!-- Logout Button -->
@@ -122,17 +159,16 @@
         // Show or Hide Buttons Based on Ownership
         function toggleVisitorMode() {
             if (profileOwner === loggedInUser.username) {
-                // Show buttons for profile owner
+                // Hide follow button for self
+                document.getElementById('followBtn').style.display = 'none';
                 document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
                     btn.style.display = 'inline-block';
                 });
-                document.getElementById('bioText').style.display = 'block';
             } else {
-                // Hide buttons for visitors
+                // Hide editing options for visitors
                 document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
                     btn.style.display = 'none';
                 });
-                document.getElementById('bioText').style.display = 'none';
             }
         }
 
@@ -193,17 +229,105 @@
             alert('Bio updated successfully!');
         }
 
-        // Logout User
-        function logout() {
-            localStorage.removeItem('loggedInUser');
-            window.location.href = 'signup-login.html';
+        // Follow / Unfollow User
+        function toggleFollow() {
+            let following = JSON.parse(localStorage.getItem(`following_${loggedInUser.username}`)) || [];
+            let followers = JSON.parse(localStorage.getItem(`followers_${profileOwner}`)) || [];
+
+            if (following.includes(profileOwner)) {
+                // Unfollow user
+                following = following.filter(user => user !== profileOwner);
+                followers = followers.filter(user => user !== loggedInUser.username);
+                alert(`You have unfollowed ${profileOwner}.`);
+            } else {
+                // Follow user
+                following.push(profileOwner);
+                followers.push(loggedInUser.username);
+                alert(`You are now following ${profileOwner}!`);
+            }
+
+            // Update local storage
+            localStorage.setItem(`following_${loggedInUser.username}`, JSON.stringify(following));
+            localStorage.setItem(`followers_${profileOwner}`, JSON.stringify(followers));
+            loadFollowData();
         }
 
-        // Initial Load Actions
-        loadProfilePicture(profileOwner);
-        loadBio(profileOwner);
-        toggleVisitorMode();
-    </script>
+        // Load Follow Data
+        function loadFollowData() {
+            const following = JSON.parse(localStorage.getItem(`following_${loggedInUser.username}`)) || [];
+            const followers = JSON.parse(localStorage.getItem(`followers_${loggedInUser.username}`)) || [];
 
+            // Update following and followers count
+            document.getElementById('followingCount').innerText = following.length;
+            document.getElementById('followerCount').innerText = followers.length;
+
+            // Load following profiles
+            document.getElementById('followingList').innerHTML = following.length > 0
+                ? following.map(user => `<div>${user}</div>`).join('')
+                : 'No following yet.';
+
+            // Load followers profiles
+            document.getElementById('followerList').innerHTML = followers.length > 0
+                ? followers.map(user => `<div>${user}</div>`).join('')
+                : 'No followers yet.';
+
+            // Check if profile owner is being followed
+            if (profileOwner && profileOwner !== loggedInUser.username) {
+                if (following.includes(profileOwner)) {
+                    document.getElementById('followBtn').innerText = 'Unfollow';
+                } else {
+                    document.getElementById('followBtn').innerText = 'Follow';
+                }
+            }
+        }
+
+        // Follow/Unfollow Function
+        function toggleFollow() {
+            const following = JSON.parse(localStorage.getItem(`following_${loggedInUser.username}`)) || [];
+            const followers = JSON.parse(localStorage.getItem(`followers_${profileOwner}`)) || [];
+
+            if (following.includes(profileOwner)) {
+                // Unfollow the user
+                const updatedFollowing = following.filter(user => user !== profileOwner);
+                const updatedFollowers = followers.filter(user => user !== loggedInUser.username);
+
+                localStorage.setItem(`following_${loggedInUser.username}`, JSON.stringify(updatedFollowing));
+                localStorage.setItem(`followers_${profileOwner}`, JSON.stringify(updatedFollowers));
+
+                document.getElementById('followBtn').innerText = 'Follow';
+                alert(`You have unfollowed ${profileOwner}`);
+            } else {
+                // Follow the user
+                following.push(profileOwner);
+                followers.push(loggedInUser.username);
+
+                localStorage.setItem(`following_${loggedInUser.username}`, JSON.stringify(following));
+                localStorage.setItem(`followers_${profileOwner}`, JSON.stringify(followers));
+
+                document.getElementById('followBtn').innerText = 'Unfollow';
+                alert(`You are now following ${profileOwner}`);
+            }
+
+            loadFollowData(); // Reload follow data to update UI
+        }
+
+        // Logout Function
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'signup-login.html'; // Redirect to login after logout
+        }
+
+        // Initial Load
+        window.onload = function () {
+            if (loggedInUser) {
+                loadProfilePicture(profileOwner);
+                loadBio(profileOwner);
+                loadFollowData();
+                toggleVisitorMode();
+            } else {
+                window.location.href = 'signup-login.html'; // Redirect if not logged in
+            }
+        };
+    </script>
 </body>
 </html>
