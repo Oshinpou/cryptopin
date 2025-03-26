@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Pin - Sign Up / Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="form-container" id="form-container">
+            <h2 id="form-title">Sign Up</h2>
+
+            <!-- Signup/Login Form -->
+            <form id="auth-form">
+                <div class="input-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" placeholder="Enter Username" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" placeholder="Enter Email" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" placeholder="Enter Password" required>
+                </div>
+
+                <button type="submit" id="auth-btn">Sign Up</button>
+                <p class="switch-form">
+                    Already have an account? <a href="#" id="switch-to-login">Login</a>
+                </p>
+            </form>
+
+            <!-- Forgot Password / Account Recovery -->
+            <div class="extra-options">
+                <a href="#" id="forgot-password">Forgot Password?</a>
+                <a href="#" id="delete-account">Delete Account</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel for CRM -->
+    <div class="admin-container" id="admin-container">
+        <h2>Admin Panel</h2>
+        <input type="text" id="search-user" placeholder="Search by Username">
+        <button onclick="searchUser()">Search</button>
+        <div id="user-details"></div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+
+</html>
