@@ -1,40 +1,146 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <title>Admin Panel | CryptoPin</title>
+    <title>CryptoPin Admin Panel 1</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1204724319985727"
+     crossorigin="anonymous"></script>
+    <meta name="google-adsense-account" content="ca-pub-1204724319985727">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #333;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #D4AF37;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #b7952c;
+        }
+        .error-msg {
+            color: #ff4d4d;
+        }
+    </style>
 </head>
 <body>
-    <div class="admin-container">
-        <h1>Admin Panel - User Management</h1>
-        
-        <!-- Search Bar to Find User -->
-        <div class="search-container">
-            <input type="text" id="searchUser" placeholder="Search by username..." />
-            <button onclick="searchUser()">Search</button>
-        </div>
-        
-        <!-- Display User Info -->
-        <div id="user-info" class="hidden">
-            <h2>User Information</h2>
-            <p><strong>Username:</strong> <span id="user-username"></span></p>
-            <p><strong>Email:</strong> <span id="user-email"></span></p>
-            <p><strong>Password:</strong> <span id="user-password"></span></p>
-            
-            <!-- Delete Button -->
-            <button class="delete-btn" onclick="confirmDelete()">Delete Account</button>
-        </div>
+    <h1>CryptoPin Admin Panel 1</h1>
 
-        <!-- Confirmation Modal for Deleting User -->
-        <div id="deleteModal" class="modal hidden">
-            <div class="modal-content">
-                <p>Are you sure you want to delete this account?</p>
-                <button onclick="deleteUser()">Yes, Delete</button>
-                <button onclick="closeModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
+    <!-- Search Bar -->
+    <input type="text" id="searchBar" placeholder="Search by Username or Email" oninput="searchUser()">
 
-    <script src="admin.js"></script>
+    <h2>Registered Users</h2>
+    <div id="userList"></div>
+
+    <h2>Account Requests</h2>
+    <div id="requestList"></div>
+
+    <script>
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const requests = JSON.parse(localStorage.getItem('requests')) || [];
+
+            let userListHTML = '<ul>';
+            users.forEach((user, index) => {
+                userListHTML += `
+                    <li>
+                        <strong>Username:</strong> ${user.username} |
+                        <strong>Email:</strong> ${user.email} |
+                        <strong>Password:</strong> ${user.password}
+                        <button onclick="deleteUser(${index})">Delete</button>
+                    </li>
+                `;
+            });
+            userListHTML += '</ul>';
+            document.getElementById('userList').innerHTML = userListHTML;
+
+            let requestListHTML = '<ul>';
+            requests.forEach((req, index) => {
+                requestListHTML += `
+                    <li>
+                        <strong>Type:</strong> ${req.type.toUpperCase()} |
+                        <strong>Username:</strong> ${req.username} |
+                        <strong>Email:</strong> ${req.email}
+                        <button onclick="processRequest(${index})">Process</button>
+                    </li>
+                `;
+            });
+            requestListHTML += '</ul>';
+            document.getElementById('requestList').innerHTML = requestListHTML;
+        }
+
+        function deleteUser(index) {
+            let users = JSON.parse(localStorage.getItem('users'));
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsers();
+        }
+
+        function processRequest(index) {
+            let requests = JSON.parse(localStorage.getItem('requests'));
+            const req = requests[index];
+            if (req.type === 'delete') {
+                deleteUserByName(req.username);
+            }
+            requests.splice(index, 1);
+            localStorage.setItem('requests', JSON.stringify(requests));
+            loadUsers();
+        }
+
+        function deleteUserByName(username) {
+            let users = JSON.parse(localStorage.getItem('users'));
+            users = users.filter(user => user.username !== username);
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        function searchUser() {
+            const searchQuery = document.getElementById('searchBar').value.toLowerCase();
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const filteredUsers = users.filter(user =>
+                user.username.toLowerCase().includes(searchQuery) ||
+                user.email.toLowerCase().includes(searchQuery)
+            );
+
+            let userListHTML = '<ul>';
+            filteredUsers.forEach((user, index) => {
+                userListHTML += `
+                    <li>
+                        <strong>Username:</strong> ${user.username} |
+                        <strong>Email:</strong> ${user.email} |
+                        <strong>Password:</strong> ${user.password}
+                        <button onclick="deleteUser(${index})">Delete</button>
+                    </li>
+                `;
+            });
+            userListHTML += '</ul>';
+            document.getElementById('userList').innerHTML = userListHTML;
+        }
+
+        loadUsers();
+    </script>
 </body>
 </html>
