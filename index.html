@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Pin - Home</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <h1>Crypto Pin</h1>
+            <nav>
+                <button id="authButton" onclick="openAuthPopup()">Login / Signup</button>
+                <a href="#" id="logoutBtn" onclick="logout()" style="display: none;">Logout</a>
+                <a href="#" id="communityLink">Community</a>
+                <a href="#" id="notificationLink">Notifications</a>
+                <a href="#" id="profileLink">Profile</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <h2>Welcome to Crypto Pin</h2>
+        <p>Explore, Share, and Connect with Crypto Enthusiasts</p>
+    </section>
+
+    <!-- Community Section -->
+    <section id="community">
+        <h3>Community Posts</h3>
+        <div id="posts"></div>
+    </section>
+
+    <!-- Chat Section -->
+    <section id="chatSection">
+        <h3>Chat</h3>
+        <div id="chatBox">
+            <input type="text" id="chatInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <div id="chatMessages"></div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-links">
+            <a href="#">Contact Us</a>
+            <a href="#">FAQ</a>
+            <a href="#">About</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms & Conditions</a>
+        </div>
+        <p>&copy; 2025 Crypto Pin. All rights reserved.</p>
+    </footer>
+
+    <!-- Auth Popup -->
+    <div id="authPopup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closeAuthPopup()">&times;</span>
+            <h3 id="authTitle">Login / Signup</h3>
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button onclick="authenticate()">Submit</button>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
