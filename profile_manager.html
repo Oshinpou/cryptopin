@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile Manager - CryptoPin</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f1f1f1;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .username {
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .upload-container {
+            margin-top: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+        input[type="file"] {
+            margin-top: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: #3897f0;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+        .content-list {
+            margin-top: 20px;
+        }
+        .content-item {
+            background: #fafafa;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .logout-btn {
+            margin-top: 20px;
+            background-color: #ff4d4d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Profile Manager</h2>
+        <div id="usernameDisplay" class="username"></div>
+
+        <div class="upload-container">
+            <h3>Upload New Content</h3>
+            <textarea id="contentText" placeholder="Enter content description..."></textarea>
+            <input type="file" id="contentFile">
+            <button onclick="uploadContent()">Upload Content</button>
+        </div>
+
+        <div class="content-list">
+            <h3>Uploaded Content</h3>
+            <div id="contentList"></div>
+        </div>
+
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        // Get logged-in user from local storage
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+        // Check if the user is logged in
+        if (!loggedInUser) {
+            window.location.href = "index.html"; // Redirect to login page if not logged in
+        } else {
+            document.getElementById('usernameDisplay').innerText = "Welcome, @" + loggedInUser.username;
+        }
+
+        // Load content from local storage
+        let userContent = JSON.parse(localStorage.getItem(loggedInUser.username + '_content')) || [];
+
+        // Display uploaded content
+        function loadContent() {
+            const contentList = document.getElementById('contentList');
+            contentList.innerHTML = '';
+
+            userContent.forEach((content, index) => {
+                contentList.innerHTML += `
+                    <div class="content-item">
+                        <p><strong>Description:</strong> ${content.text}</p>
+                        ${content.file ? `<p><strong>File:</strong> <a href="${content.file}" target="_blank">View File</a></p>` : ''}
+                        <button onclick="deleteContent(${index})">Delete</button>
+                    </div>
+                `;
+            });
+        }
+
+        // Upload content function
+        function uploadContent() {
+            const contentText = document.getElementById('contentText').value.trim();
+            const contentFile = document.getElementById('contentFile').files[0];
+
+            if (!contentText && !contentFile) {
+                alert('⚠️ Please add content or choose a file!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const content = {
+                    text: contentText,
+                    file: contentFile ? e.target.result : null
+                };
+
+                // Save content in CRM local storage
+                userContent.push(content);
+                localStorage.setItem(loggedInUser.username + '_content', JSON.stringify(userContent));
+
+                // Clear input fields and reload content
+                document.getElementById('contentText').value = '';
+                document.getElementById('contentFile').value = '';
+                loadContent();
+                alert('✅ Content uploaded successfully!');
+            };
+
+            if (contentFile) {
+                reader.readAsDataURL(contentFile);
+            } else {
+                reader.onload();
+            }
+        }
+
+        // Delete content function
+        function deleteContent(index) {
+            userContent.splice(index, 1);
+            localStorage.setItem(loggedInUser.username + '_content', JSON.stringify(userContent));
+            loadContent();
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = "index.html";
+        }
+
+        // Load content on page load
+        window.onload = loadContent;
+    </script>
+
+</body>
+</html>
