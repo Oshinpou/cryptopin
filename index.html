@@ -37,12 +37,21 @@
             color: #ff4d4d;
             margin-top: 10px;
         }
+        #profileInfo {
+            margin-top: 20px;
+            color: #D4AF37;
+        }
     </style>
 </head>
 <body>
 
     <div class="form-container">
         <h2>Crypto Pin - Social Hub</h2>
+
+        <div id="profileInfo" style="display: none;">
+            <h3>Welcome, <span id="loggedInUser"></span>!</h3>
+            <button onclick="logout()">Logout</button>
+        </div>
 
         <!-- Sign Up Form -->
         <form id="signupForm">
@@ -84,6 +93,22 @@
     <script>
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
+        // Check if a user is already logged in
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        if (loggedInUser) {
+            showLoggedInUI(loggedInUser.username);
+        }
+
+        // Show logged-in UI
+        function showLoggedInUI(username) {
+            document.getElementById('profileInfo').style.display = 'block';
+            document.getElementById('loggedInUser').innerText = username;
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('recoverForm').style.display = 'none';
+            document.getElementById('deleteForm').style.display = 'none';
+        }
+
         // Sign Up
         function signUp() {
             const username = document.getElementById('signupUsername').value.trim();
@@ -120,7 +145,15 @@
             }
 
             localStorage.setItem('loggedInUser', JSON.stringify(user));
-            alert('✅ Login Successful!');
+            alert('✅ Login Successful! Redirecting to your profile...');
+            window.location.href = `${user.profileLink}.html`;
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            alert('✅ Logged out successfully.');
+            window.location.href = 'signup-login.html';
         }
 
         // Recover Password
@@ -152,6 +185,7 @@
             users.splice(index, 1);
             localStorage.setItem('users', JSON.stringify(users));
             alert('🗑️ Account deleted successfully.');
+            logout();
         }
     </script>
 </body>
