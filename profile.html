@@ -53,31 +53,31 @@
         const userCode = urlParams.get('code');
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // Find user by code
+        // Find user by unique code
         const user = users.find(user => user.code === userCode);
 
         if (user) {
             document.getElementById('username').innerText = user.username;
             document.getElementById('email').innerText = user.email;
-            const profileLink = generateProfileLink(user.username, user.code);
 
-            // Display profile link
+            // Generate and display correct profile link
+            const profileLink = generateProfileLink(user.code);
             document.getElementById('profileLink').href = profileLink;
             document.getElementById('profileLink').innerText = profileLink;
 
-            // Update user profile link in local storage (CRM)
-            updateUserProfileLink(user.username, profileLink);
+            // Store or update profile link in CRM
+            updateProfileLink(user.username, profileLink);
         } else {
             document.querySelector('.container').innerHTML = `<h2>Profile Not Found</h2>`;
         }
 
-        // Generate unique profile link
-        function generateProfileLink(username, code) {
+        // Generate unique profile link with correct URL
+        function generateProfileLink(code) {
             return `${window.location.origin}/profile.html?code=${code}`;
         }
 
-        // Update profile link in CRM
-        function updateUserProfileLink(username, profileLink) {
+        // Store profile link in local storage (CRM) by username
+        function updateProfileLink(username, profileLink) {
             let storedProfiles = JSON.parse(localStorage.getItem('userProfiles')) || {};
             storedProfiles[username] = profileLink;
             localStorage.setItem('userProfiles', JSON.stringify(storedProfiles));
