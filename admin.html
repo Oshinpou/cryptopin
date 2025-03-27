@@ -71,25 +71,18 @@
                 userListContainer.innerHTML += `
                     <div class="user-item">
                         <strong>${user.username}</strong> | ${user.email}
-                        <br>Profile Link: <a href="${user.profileLink}.html" target="_blank">${user.profileLink}</a>
+                        <br>Profile Link: <a href="${user.profileLink}.html" target="_blank">${user.profileLink}.html</a>
+                        <br>Password: ${user.password}
                         <br>
-                        <button class="btn view-btn" onclick="viewProfile('${user.username}')">View Profile</button>
+                        <button class="btn view-btn" onclick="viewProfile('${user.profileLink}')">View Profile</button>
                         <button class="btn delete-btn" onclick="deleteUser('${user.username}')">Delete</button>
                     </div>`;
             });
         }
 
         // View Profile Details
-        function viewProfile(username) {
-            const user = users.find(u => u.username === username);
-            if (user) {
-                alert(`
-🔗 Profile Link: ${user.profileLink}.html
-🔐 Password: ${user.password}
-                `);
-            } else {
-                alert('❌ User not found.');
-            }
+        function viewProfile(profileLink) {
+            window.open(`${profileLink}.html`, '_blank');
         }
 
         // Delete User
