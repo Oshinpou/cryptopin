@@ -9,7 +9,7 @@
             background: #1a1a1a;
             font-family: Arial, sans-serif;
         }
-        .form-container {
+        .container {
             background: rgba(34, 34, 34, 0.9);
             padding: 20px;
             border-radius: 10px;
@@ -37,11 +37,17 @@
             color: #ff4d4d;
             margin-top: 10px;
         }
+        .link {
+            margin-top: 10px;
+            color: #D4AF37;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div class="form-container" id="form-container">
+    <!-- Form Container -->
+    <div class="container" id="form-container">
         <h2>Crypto Pin - Social Hub</h2>
 
         <!-- Sign Up Form -->
@@ -62,17 +68,6 @@
         </form>
 
         <div id="error" class="error-msg"></div>
-
-        <h4>Forgot Password?</h4>
-        <input type="text" id="recoverUsername" placeholder="Enter Username">
-        <input type="email" id="recoverEmail" placeholder="Enter Email">
-        <button type="button" onclick="recoverPassword()">Recover Password</button>
-
-        <h4>Delete Account</h4>
-        <input type="text" id="deleteUsername" placeholder="Enter Username">
-        <input type="email" id="deleteEmail" placeholder="Enter Email">
-        <input type="password" id="deletePassword" placeholder="Enter Password">
-        <button type="button" onclick="deleteAccount()">Delete Account</button>
     </div>
 
     <script>
@@ -94,19 +89,23 @@
                 return;
             }
 
-            const profileLink = `profile-${username}-${Date.now()}`;
-            const newUser = { username, email, password, profileLink };
+            const profileLink = `profile-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+            const newUser = { username, email, password, profileLink, data: {} };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
 
-            generateProfilePage(newUser);
-            alert('✅ Sign Up Successful! Your profile link: ' + profileLink);
+            alert(`✅ Sign Up Successful!`);
         }
 
         // Login Function
         function login() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
+
+            if (!username || !password) {
+                alert('⚠️ All fields are required!');
+                return;
+            }
 
             const user = users.find(u => u.username === username && u.password === password);
             if (!user) {
@@ -115,67 +114,14 @@
             }
 
             localStorage.setItem('loggedInUser', JSON.stringify(user));
-            window.location.href = `${user.profileLink}.html`;
+            alert('✅ Login Successful! Redirecting to profile...');
+            window.location.href = `?user=${user.username}`;
         }
 
-        // Generate Profile Page
-        function generateProfilePage(user) {
-            const profileContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>${user.username} - Profile</title>
-                    <style>
-                        body { margin: 0; padding: 0; background: #1a1a1a; font-family: Arial, sans-serif; color: #fff; }
-                        .profile-container { width: 60%; margin: 10% auto; padding: 20px; background: rgba(34, 34, 34, 0.9); border-radius: 10px; text-align: center; }
-                        a { color: #D4AF37; text-decoration: none; }
-                    </style>
-                </head>
-                <body>
-                    <div class="profile-container">
-                        <h2>Welcome, ${user.username}!</h2>
-                        <p>Your profile link: <a href="${user.profileLink}.html">${user.profileLink}.html</a></p>
-                        <p>Email: ${user.email}</p>
-                        <p>Password: ${user.password}</p>
-                    </div>
-                </body>
-                </html>
-            `;
-
-            const blob = new Blob([profileContent], { type: 'text/html' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${user.profileLink}.html`;
-            link.click();
-        }
-
-        // Recover Password
-        function recoverPassword() {
-            const username = document.getElementById('recoverUsername').value.trim();
-            const email = document.getElementById('recoverEmail').value.trim();
-            const user = users.find(u => u.username === username && u.email === email);
-
-            if (user) {
-                alert(`✅ Password recovered successfully!\nYour password is: ${user.password}`);
-            } else {
-                alert('❌ User not found with provided details.');
-            }
-        }
-
-        // Delete Account
-        function deleteAccount() {
-            const username = document.getElementById('deleteUsername').value.trim();
-            const email = document.getElementById('deleteEmail').value.trim();
-            const password = document.getElementById('deletePassword').value.trim();
-
-            const userIndex = users.findIndex(u => u.username === username && u.email === email && u.password === password);
-            if (userIndex !== -1) {
-                users.splice(userIndex, 1);
-                localStorage.setItem('users', JSON.stringify(users));
-                alert('🗑️ Account deleted successfully.');
-            } else {
-                alert('❌ Account not found or incorrect details.');
-            }
+        // Check if Logged In
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        if (loggedInUser) {
+            window.location.href = `?user=${loggedInUser.username}`;
         }
     </script>
 </body>
