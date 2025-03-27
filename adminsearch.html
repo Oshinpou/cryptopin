@@ -1,56 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Panel - CryptoPin</title>
+    <title>Admin Panel - User Profiles</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
             margin: 0;
             padding: 20px;
-            text-align: center;
+            background: #f4f4f4;
+            font-family: Arial, sans-serif;
         }
-        .admin-container {
+        .container {
             max-width: 600px;
             margin: 0 auto;
             background: #fff;
             padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         h2 {
-            margin-top: 0;
+            text-align: center;
+            margin-bottom: 20px;
         }
-        .link {
-            margin-top: 20px;
+        .profile-list {
+            list-style-type: none;
+            padding: 0;
         }
-        .link a {
-            color: #3897f0;
+        .profile-list li {
+            background: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        a {
+            color: #007bff;
             text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .no-profiles {
+            text-align: center;
+            color: #888;
         }
     </style>
 </head>
 <body>
 
-    <div class="admin-container">
-        <h2>Admin Panel</h2>
-        <p>View User Profiles:</p>
-        <div id="userLinks"></div>
-    </div>
+<div class="container">
+    <h2>Admin Panel - User Profiles</h2>
+    <ul id="profileList" class="profile-list"></ul>
+    <p id="noProfiles" class="no-profiles" style="display:none;">No profiles found.</p>
+</div>
 
-    <script>
-        // Load all registered users
-        const users = JSON.parse(localStorage.getItem('users')) || [];
+<script>
+    // Load Admin Data
+    function loadProfiles() {
+        const adminData = JSON.parse(localStorage.getItem('adminData')) || [];
 
-        // Display all profile links for admin
-        const userLinksDiv = document.getElementById('userLinks');
-        if (users.length > 0) {
-            users.forEach(user => {
-                userLinksDiv.innerHTML += `<p><a href="${user.uniqueLink}" target="_blank">${user.username}'s Profile</a></p>`;
-            });
+        const profileList = document.getElementById('profileList');
+        const noProfiles = document.getElementById('noProfiles');
+
+        if (adminData.length === 0) {
+            noProfiles.style.display = 'block';
         } else {
-            userLinksDiv.innerHTML = '<p>No users found.</p>';
+            adminData.forEach(profile => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <strong>${profile.username}</strong> - 
+                    <a href="${profile.uniqueLink}" target="_blank">View Profile</a>
+                `;
+                profileList.appendChild(li);
+            });
         }
-    </script>
+    }
+
+    // Load Profiles on Page Load
+    window.onload = loadProfiles;
+</script>
+
 </body>
 </html>
