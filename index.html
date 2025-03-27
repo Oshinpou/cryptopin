@@ -13,7 +13,7 @@
             background: rgba(34, 34, 34, 0.9);
             padding: 20px;
             border-radius: 10px;
-            width: 350px;
+            width: 320px;
             margin: 5% auto;
             text-align: center;
             color: #fff;
@@ -37,11 +37,6 @@
             color: #ff4d4d;
             margin-top: 10px;
         }
-        .link {
-            margin-top: 10px;
-            color: #D4AF37;
-            cursor: pointer;
-        }
         .hidden {
             display: none;
         }
@@ -49,49 +44,42 @@
 </head>
 <body>
 
-    <!-- Main Container -->
-    <div class="container" id="form-container">
+    <div class="container" id="auth-container">
         <h2>Crypto Pin - Social Hub</h2>
 
         <!-- Sign Up Form -->
-        <form id="signupForm">
+        <div id="signupForm">
             <h3>Sign Up</h3>
             <input type="text" id="signupUsername" placeholder="Enter Username" required>
             <input type="email" id="signupEmail" placeholder="Enter Email" required>
             <input type="password" id="signupPassword" placeholder="Enter Password" required>
-            <button type="button" onclick="signUp()">Sign Up</button>
-        </form>
+            <button onclick="signUp()">Sign Up</button>
+        </div>
 
         <!-- Login Form -->
-        <form id="loginForm">
+        <div id="loginForm">
             <h3>Login</h3>
             <input type="text" id="loginUsername" placeholder="Enter Username" required>
             <input type="password" id="loginPassword" placeholder="Enter Password" required>
-            <button type="button" onclick="login()">Login</button>
-        </form>
-
-        <!-- Recover Password -->
-        <div class="link" onclick="showRecoverForm()">Forgot Password?</div>
+            <button onclick="login()">Login</button>
+        </div>
 
         <!-- Recover Password Form -->
-        <form id="recoverForm" class="hidden">
+        <div id="recoverForm">
             <h3>Recover Password</h3>
             <input type="text" id="recoverUsername" placeholder="Enter Username" required>
             <input type="email" id="recoverEmail" placeholder="Enter Email" required>
-            <button type="button" onclick="recoverPassword()">Recover</button>
-        </form>
-
-        <!-- Delete Account -->
-        <div class="link" onclick="showDeleteForm()">Delete Account</div>
+            <button onclick="recoverPassword()">Recover</button>
+        </div>
 
         <!-- Delete Account Form -->
-        <form id="deleteForm" class="hidden">
+        <div id="deleteForm">
             <h3>Delete Account</h3>
             <input type="text" id="deleteUsername" placeholder="Enter Username" required>
             <input type="email" id="deleteEmail" placeholder="Enter Email" required>
             <input type="password" id="deletePassword" placeholder="Enter Password" required>
-            <button type="button" onclick="deleteAccount()">Delete Account</button>
-        </form>
+            <button onclick="deleteAccount()">Delete</button>
+        </div>
 
         <div id="error" class="error-msg"></div>
     </div>
@@ -99,7 +87,7 @@
     <script>
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // Sign Up Function
+        // --- Sign Up ---
         function signUp() {
             const username = document.getElementById('signupUsername').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
@@ -116,14 +104,14 @@
             }
 
             const profileLink = `profile-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-            const newUser = { username, email, password, profileLink, data: {} };
+            const newUser = { username, email, password, profileLink };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
 
-            alert(`✅ Sign Up Successful!`);
+            alert(`✅ Sign Up Successful! Your profile link: ${profileLink}`);
         }
 
-        // Login Function
+        // --- Login ---
         function login() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
@@ -139,56 +127,74 @@
                 return;
             }
 
+            // Redirect to Profile Link Dynamically
             localStorage.setItem('loggedInUser', JSON.stringify(user));
-            alert('✅ Login Successful! Redirecting to profile...');
-            window.location.href = `?user=${user.username}`;
+            window.location.href = `?profile=${user.profileLink}`;
         }
 
-        // Recover Password
+        // --- Recover Password ---
         function recoverPassword() {
             const username = document.getElementById('recoverUsername').value.trim();
             const email = document.getElementById('recoverEmail').value.trim();
 
             const user = users.find(u => u.username === username && u.email === email);
-            if (!user) {
-                alert('❌ User not found or invalid details.');
-                return;
+            if (user) {
+                alert(`✅ Password recovered! Your password: ${user.password}`);
+            } else {
+                alert('❌ No matching account found.');
             }
-
-            alert(`✅ Password for ${username} is: ${user.password}`);
         }
 
-        // Delete Account
+        // --- Delete Account ---
         function deleteAccount() {
             const username = document.getElementById('deleteUsername').value.trim();
             const email = document.getElementById('deleteEmail').value.trim();
             const password = document.getElementById('deletePassword').value.trim();
 
             const userIndex = users.findIndex(u => u.username === username && u.email === email && u.password === password);
-            if (userIndex === -1) {
-                alert('❌ User not found or incorrect details.');
-                return;
+            if (userIndex !== -1) {
+                users.splice(userIndex, 1);
+                localStorage.setItem('users', JSON.stringify(users));
+                alert('🗑️ Account deleted.');
+            } else {
+                alert('❌ No matching account found.');
             }
-
-            users.splice(userIndex, 1);
-            localStorage.setItem('users', JSON.stringify(users));
-            alert(`✅ Account for ${username} deleted successfully.`);
         }
 
-        // Show Recover Form
-        function showRecoverForm() {
-            document.getElementById('recoverForm').classList.toggle('hidden');
+        // --- Dynamic Profile Page Generation ---
+        function showProfilePage(user) {
+            document.body.innerHTML = `
+                <div class="container">
+                    <h2>Welcome, ${user.username}!</h2>
+                    <p>Email: ${user.email}</p>
+                    <p>Password: ${user.password}</p>
+                    <p>Profile Link: ${user.profileLink}</p>
+                    <button onclick="logout()">Logout</button>
+                </div>
+            `;
         }
 
-        // Show Delete Form
-        function showDeleteForm() {
-            document.getElementById('deleteForm').classList.toggle('hidden');
+        // --- Logout Function ---
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'signuplogin.html';
         }
 
-        // Auto Redirect to Profile if Logged In
+        // --- Auto Load Profile if Logged In ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const profileLink = urlParams.get('profile');
         const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        if (loggedInUser) {
-            window.location.href = `?user=${loggedInUser.username}`;
+        
+        if (profileLink) {
+            const userProfile = users.find(user => user.profileLink === profileLink);
+            if (userProfile) {
+                showProfilePage(userProfile);
+            } else {
+                alert('❌ Profile not found!');
+                window.location.href = 'signuplogin.html';
+            }
+        } else if (loggedInUser) {
+            showProfilePage(loggedInUser);
         }
     </script>
 </body>
