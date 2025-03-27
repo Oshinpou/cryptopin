@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CryptoPin Admin Panel</title>
+    <title>PinAdmin Panel</title>
     <style>
         body {
             margin: 0;
@@ -50,7 +50,7 @@
 <body>
 
     <div class="container">
-        <h2>CryptoPin Admin Panel</h2>
+        <h2>PinAdmin Panel</h2>
 
         <h3>Add New User</h3>
         <input type="text" id="username" placeholder="Username">
@@ -64,47 +64,52 @@
     <script>
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
+        // Add new user and generate profile link
         function addUser() {
             const username = document.getElementById('username').value.trim();
             const email = document.getElementById('email').value.trim();
             if (!username || !email) {
-                alert('Please enter valid username and email.');
+                alert('Please enter a valid username and email.');
                 return;
             }
 
             const uniqueCode = generateUniqueCode();
-            const newUser = { username, email, code: uniqueCode };
+            const profileLink = generateProfileLink(uniqueCode);
+            const newUser = { username, email, code: uniqueCode, link: profileLink };
+
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
             loadUsers();
             alert('User added successfully!');
         }
 
+        // Generate unique profile code
         function generateUniqueCode() {
             return `CP-${Math.floor(100000 + Math.random() * 900000)}`;
         }
 
+        // Generate correct profile link (without HTML extension)
+        function generateProfileLink(code) {
+            return `${window.location.origin}/?code=${code}`;
+        }
+
+        // Load and display users
         function loadUsers() {
-    const userList = document.getElementById('userList');
-    let storedProfiles = JSON.parse(localStorage.getItem('userProfiles')) || {};
+            const userList = document.getElementById('userList');
+            if (users.length === 0) {
+                userList.innerHTML = '<p>No users found.</p>';
+                return;
+            }
+            userList.innerHTML = users.map((user, index) => `
+                <div class="user-item">
+                    <p><strong>${user.username}</strong> (${user.email})</p>
+                    <p>Profile Link: <a href="${user.link}" target="_blank">${user.link}</a></p>
+                    <button class="delete-btn" onclick="deleteUser(${index})">Delete</button>
+                </div>
+            `).join('');
+        }
 
-    if (users.length === 0) {
-        userList.innerHTML = '<p>No users found.</p>';
-        return;
-    }
-
-    userList.innerHTML = users.map((user, index) => {
-        const profileLink = storedProfiles[user.username] || `profile.html?code=${user.code}`;
-        return `
-            <div class="user-item">
-                <p><strong>${user.username}</strong> (${user.email})</p>
-                <p>Profile Link: <a href="${profileLink}" target="_blank">View Profile</a></p>
-                <button class="delete-btn" onclick="deleteUser(${index})">Delete</button>
-            </div>
-        `;
-    }).join('');
-}
-
+        // Delete user and update local storage
         function deleteUser(index) {
             users.splice(index, 1);
             localStorage.setItem('users', JSON.stringify(users));
