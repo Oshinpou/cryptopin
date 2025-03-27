@@ -47,17 +47,24 @@
 
     <script>
         // Retrieve logged-in user data from local storage
-        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        const urlParams = new URLSearchParams(window.location.search);
+        const usernameFromURL = urlParams.get('user');
+        const users = JSON.parse(localStorage.getItem('users')) || [];
         
-        if (loggedInUser) {
-            const username = loggedInUser.username;
-            const profileLink = `profile.html?user=${encodeURIComponent(username)}`;
-            
-            document.getElementById('username').innerText = `Welcome, ${username}!`;
-            document.getElementById('profileLink').innerHTML = `Your profile link: <a href="${profileLink}">${profileLink}</a>`;
+        let user;
+        
+        if (usernameFromURL) {
+            user = users.find(u => u.uniqueLink === `profile.html?user=${encodeURIComponent(usernameFromURL)}`);
         } else {
-            alert('⚠️ No user logged in.');
-            window.location.href = 'index.html';
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            user = loggedInUser ? users.find(u => u.username === loggedInUser.username) : null;
+        }
+
+        if (user) {
+            document.getElementById('username').innerText = `Welcome, ${user.username}!`;
+            document.getElementById('profileLink').innerHTML = `Your profile link: <a href="${user.uniqueLink}">${user.uniqueLink}</a>`;
+        } else {
+            document.body.innerHTML = '<h2>⚠️ Profile Not Found</h2>';
         }
     </script>
 </body>
