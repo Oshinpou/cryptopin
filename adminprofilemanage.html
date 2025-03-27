@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel - Manage CryptoPin Profiles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        #adminPanel {
+            margin-top: 50px;
+            width: 90%;
+            max-width: 700px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        #searchSection input {
+            padding: 10px;
+            width: 60%;
+            margin-right: 10px;
+        }
+        #searchSection button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        #searchSection button:hover {
+            background-color: #218838;
+        }
+        #userProfileData {
+            margin-top: 30px;
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #manageButtons button {
+            padding: 10px 15px;
+            margin: 5px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        #manageButtons button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="adminPanel">
+        <h2>CryptoPin Admin Panel</h2>
+
+        <!-- Search Section -->
+        <div id="searchSection">
+            <input type="text" id="searchUsername" placeholder="Search username...">
+            <button onclick="searchUser()">Search User</button>
+        </div>
+
+        <!-- User Data Display -->
+        <div id="userProfileData" style="display: none;">
+            <h3>Profile Details</h3>
+            <p><strong>Username:</strong> <span id="profileUsername"></span></p>
+            <p><strong>Bio:</strong> <span id="profileBio"></span></p>
+            <p><strong>Followers:</strong> <span id="profileFollowers">0</span></p>
+            <p><strong>Following:</strong> <span id="profileFollowing">0</span></p>
+            <p><strong>Profile Visits:</strong> <span id="profileVisits">0</span></p>
+
+            <!-- Admin Buttons -->
+            <div id="manageButtons">
+                <button onclick="resetPassword()">Reset Password</button>
+                <button onclick="deleteProfile()">Delete Profile</button>
+                <button onclick="updateBio()">Update Bio</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load All Users for Search
+        function getAllUsers() {
+            const allUsers = JSON.parse(localStorage.getItem('allUsers')) || [];
+            return allUsers;
+        }
+
+        // Search User Profile by Username
+        function searchUser() {
+            const searchUsername = document.getElementById('searchUsername').value.trim();
+            const allUsers = getAllUsers();
+            const userProfile = allUsers.find(user => user.username === searchUsername);
+
+            if (userProfile) {
+                displayUserProfile(userProfile);
+            } else {
+                alert('User not found!');
+            }
+        }
+
+        // Display User Profile Data
+        function displayUserProfile(userProfile) {
+            document.getElementById('profileUsername').innerText = userProfile.username;
+            document.getElementById('profileBio').innerText = userProfile.bio || 'No bio available.';
+            document.getElementById('profileFollowers').innerText = userProfile.followers ? userProfile.followers.length : 0;
+            document.getElementById('profileFollowing').innerText = userProfile.following ? userProfile.following.length : 0;
+            document.getElementById('profileVisits').innerText = userProfile.profileVisits || 0;
+            document.getElementById('userProfileData').style.display = 'block';
+        }
+
+        // Reset User Password
+        function resetPassword() {
+            const username = document.getElementById('profileUsername').innerText;
+            const newPassword = prompt('Enter a new password for ' + username);
+            if (newPassword) {
+                const allUsers = getAllUsers();
+                const userIndex = allUsers.findIndex(user => user.username === username);
+
+                if (userIndex !== -1) {
+                    allUsers[userIndex].password = newPassword;
+                    localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                    alert('Password reset successfully!');
+                } else {
+                    alert('User not found!');
+                }
+            }
+        }
+
+        // Delete User Profile
+        function deleteProfile() {
+            const username = document.getElementById('profileUsername').innerText;
+            if (confirm('Are you sure you want to delete this profile?')) {
+                let allUsers = getAllUsers();
+                allUsers = allUsers.filter(user => user.username !== username);
+                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                alert('Profile deleted successfully!');
+                clearProfileDisplay();
+            }
+        }
+
+        // Update Bio
+        function updateBio() {
+            const username = document.getElementById('profileUsername').innerText;
+            const newBio = prompt('Enter a new bio for ' + username);
+            if (newBio) {
+                const allUsers = getAllUsers();
+                const userIndex = allUsers.findIndex(user => user.username === username);
+
+                if (userIndex !== -1) {
+                    allUsers[userIndex].bio = newBio;
+                    localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                    alert('Bio updated successfully!');
+                    document.getElementById('profileBio').innerText = newBio;
+                } else {
+                    alert('User not found!');
+                }
+            }
+        }
+
+        // Clear Profile Display
+        function clearProfileDisplay() {
+            document.getElementById('profileUsername').innerText = '';
+            document.getElementById('profileBio').innerText = '';
+            document.getElementById('profileFollowers').innerText = 0;
+            document.getElementById('profileFollowing').innerText = 0;
+            document.getElementById('profileVisits').innerText = 0;
+            document.getElementById('userProfileData').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
