@@ -29,6 +29,18 @@
             border: 1px solid #ddd;
             margin-top: 10px;
         }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #3897f0;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
     </style>
 </head>
 <body>
@@ -44,9 +56,11 @@
         const profileCode = urlParams.get('code');
         const profileCodes = JSON.parse(localStorage.getItem('profileCodes')) || {};
         const users = JSON.parse(localStorage.getItem('users')) || [];
-
+        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        
         // Find the username linked to the profile code
         const foundUsername = Object.keys(profileCodes).find(username => profileCodes[username] === profileCode);
+        let followingList = JSON.parse(localStorage.getItem(`following-${loggedInUser?.username}`)) || [];
 
         if (!foundUsername) {
             document.getElementById('profileContainer').innerHTML = '<p>❌ Profile not found.</p>';
@@ -59,6 +73,10 @@
                     <p><strong>Username:</strong> ${foundUser.username}</p>
                     <p><strong>Email:</strong> ${foundUser.email}</p>
                     <p><strong>Profile Code:</strong> ${profileCode}</p>
+                    <button onclick="toggleFollow('${foundUser.username}')">
+                        ${followingList.includes(foundUser.username) ? 'Unfollow' : 'Follow'}
+                    </button>
+                    <button onclick="startChat('${foundUser.username}')">Chat</button>
                 `;
 
                 // Load User Posts
@@ -76,6 +94,29 @@
             } else {
                 document.getElementById('profileContainer').innerHTML = '<p>❌ Profile not found.</p>';
             }
+        }
+
+        // Toggle Follow/Unfollow
+        function toggleFollow(username) {
+            if (!loggedInUser) {
+                alert('Please log in to follow users.');
+                return;
+            }
+
+            if (followingList.includes(username)) {
+                followingList = followingList.filter(u => u !== username);
+                alert(`Unfollowed ${username}`);
+            } else {
+                followingList.push(username);
+                alert(`Following ${username}`);
+            }
+            localStorage.setItem(`following-${loggedInUser.username}`, JSON.stringify(followingList));
+            window.location.reload();
+        }
+
+        // Start Chat (Dummy action for now)
+        function startChat(username) {
+            alert(`Starting chat with ${username}`);
         }
     </script>
 </body>
