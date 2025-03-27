@@ -8,104 +8,131 @@
             padding: 0;
             background: #1a1a1a;
             font-family: Arial, sans-serif;
+            color: #fff;
         }
         .container {
+            width: 90%;
+            margin: 5% auto;
             background: rgba(34, 34, 34, 0.9);
             padding: 20px;
             border-radius: 10px;
-            width: 90%;
-            margin: 5% auto;
-            color: #fff;
         }
-        .btn {
-            padding: 10px 15px;
-            margin-top: 10px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #2a2a2a;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #444;
+            text-align: center;
+        }
+        th {
+            background-color: #D4AF37;
+            color: #000;
+        }
+        tr:nth-child(even) {
+            background-color: #333;
+        }
+        button {
+            padding: 8px 12px;
             background-color: #D4AF37;
             color: #000;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        .btn:hover {
+        button:hover {
             background-color: #b7952c;
         }
-        .search-bar {
-            width: 50%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
+        .error-msg {
+            color: #ff4d4d;
+            margin-top: 10px;
         }
-        .user-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .user-item {
-            padding: 10px;
-            border-bottom: 1px solid #444;
-        }
-        a {
-            color: #D4AF37;
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Admin Panel</h2>
-        <input type="text" class="search-bar" id="searchBar" placeholder="Search Username" onkeyup="searchUser()">
-        <div class="user-list" id="userList"></div>
+        <h2>Crypto Pin - Admin Panel</h2>
+        <table id="userTable">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Profile Link</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userList"></tbody>
+        </table>
+
+        <button onclick="logout()">Logout</button>
+        <div id="error" class="error-msg"></div>
     </div>
 
     <script>
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // Display Users
-        function displayUsers(usersList) {
-            const userListContainer = document.getElementById('userList');
-            userListContainer.innerHTML = '';
+        // --- Load Users in Admin Panel ---
+        function loadUsers() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
 
-            if (usersList.length === 0) {
-                userListContainer.innerHTML = '<p>No users found.</p>';
+            if (users.length === 0) {
+                userList.innerHTML = `<tr><td colspan="5">No users found.</td></tr>`;
                 return;
             }
 
-            usersList.forEach(user => {
-                userListContainer.innerHTML += `
-                    <div class="user-item">
-                        <p><strong>Username:</strong> ${user.username}</p>
-                        <p><strong>Email:</strong> ${user.email}</p>
-                        <p><strong>Password:</strong> ${user.password}</p>
-                        <p><strong>Profile Link:</strong> 
-                            <a href="signuplogin.html?user=${user.username}" target="_blank">View Profile</a>
-                        </p>
-                        <button class="btn" onclick="deleteUser('${user.username}')">Delete</button>
-                    </div>
+            users.forEach((user, index) => {
+                userList.innerHTML += `
+                    <tr>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>${user.password}</td>
+                        <td><a href="?profile=${user.profileLink}" target="_blank">${user.profileLink}</a></td>
+                        <td>
+                            <button onclick="viewProfile('${user.profileLink}')">View Profile</button>
+                            <button onclick="deleteUser(${index})">Delete</button>
+                        </td>
+                    </tr>
                 `;
             });
         }
 
-        // Initial Display
-        displayUsers(users);
-
-        // Search User
-        function searchUser() {
-            const query = document.getElementById('searchBar').value.toLowerCase();
-            const filteredUsers = users.filter(user =>
-                user.username.toLowerCase().includes(query)
-            );
-            displayUsers(filteredUsers);
-        }
-
-        // Delete User
-        function deleteUser(username) {
-            const confirmDelete = confirm(`Are you sure you want to delete the user "${username}"?`);
-            if (confirmDelete) {
-                users = users.filter(user => user.username !== username);
-                localStorage.setItem('users', JSON.stringify(users));
-                alert(`User "${username}" deleted successfully.`);
-                displayUsers(users);
+        // --- View Profile by Profile Link ---
+        function viewProfile(profileLink) {
+            const user = users.find(u => u.profileLink === profileLink);
+            if (user) {
+                window.open(`signuplogin.html?profile=${profileLink}`, '_blank');
+            } else {
+                alert('❌ Profile not found!');
             }
         }
+
+        // --- Delete User ---
+        function deleteUser(index) {
+            if (confirm(`Are you sure you want to delete ${users[index].username}?`)) {
+                users.splice(index, 1);
+                localStorage.setItem('users', JSON.stringify(users));
+                loadUsers();
+                alert('🗑️ User deleted successfully.');
+            }
+        }
+
+        // --- Logout Function ---
+        function logout() {
+            window.location.href = 'signuplogin.html';
+        }
+
+        // --- Auto Load Users on Admin Panel Load ---
+        loadUsers();
     </script>
+
 </body>
 </html>
