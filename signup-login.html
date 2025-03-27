@@ -106,60 +106,61 @@
         let requests = JSON.parse(localStorage.getItem('requests')) || [];
 
         // Unique ID Generator
-function generateUniqueLink(username) {
-    const uniqueID = Date.now() + Math.floor(Math.random() * 10000);
-    return `profile.html?user=${encodeURIComponent(username)}-${uniqueID}`;
-}
+        function generateUniqueLink(username) {
+            const uniqueID = Date.now() + Math.floor(Math.random() * 10000);
+            return `profile.html?user=${encodeURIComponent(username)}-${uniqueID}`;
+        }
 
-// Sign Up with Link Generation
-function signUp() {
-    const username = document.getElementById('signupUsername').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value.trim();
-    
-    if (!username || !email || !password) {
-        alert('⚠️ All fields are required!');
-        return;
-    }
+        // Sign Up with Link Generation
+        function signUp() {
+            const username = document.getElementById('signupUsername').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            
+            if (!username || !email || !password) {
+                alert('⚠️ All fields are required!');
+                return;
+            }
 
-    if (users.find(user => user.username === username || user.email === email)) {
-        alert('⚠️ Username or Email already exists.');
-        return;
-    }
+            if (users.find(user => user.username === username || user.email === email)) {
+                alert('⚠️ Username or Email already exists.');
+                return;
+            }
 
-    // Generate a unique profile link for the new user
-    const uniqueLink = generateUniqueLink(username);
+            // Generate a unique profile link for the new user
+            const uniqueLink = generateUniqueLink(username);
 
-    // Create a new user with unique link
-    users.push({ username, email, password, uniqueLink });
-    localStorage.setItem('users', JSON.stringify(users));
-    alert('✅ Sign Up Successful! You can now log in.');
-}
+            // Create a new user with unique link
+            users.push({ username, email, password, uniqueLink });
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('✅ Sign Up Successful! You can now log in.');
+        }
 
-// Login and Redirect to Profile
-function login() {
-    const usernameOrEmail = document.getElementById('loginUsername').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
-    
-    if (!usernameOrEmail || !password) {
-        alert('⚠️ Both fields are required!');
-        return;
-    }
+        // Login and Redirect to Profile
+        function login() {
+            const usernameOrEmail = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            if (!usernameOrEmail || !password) {
+                alert('⚠️ Both fields are required!');
+                return;
+            }
 
-    const user = users.find(u => 
-        (u.username === usernameOrEmail || u.email === usernameOrEmail) && 
-        u.password === password
-    );
+            const user = users.find(u => 
+                (u.username === usernameOrEmail || u.email === usernameOrEmail) && 
+                u.password === password
+            );
 
-    if (!user) {
-        document.getElementById("error").innerText = "❌ Invalid username/email or password.";
-        return;
-    }
+            if (!user) {
+                document.getElementById("error").innerText = "❌ Invalid username/email or password.";
+                return;
+            }
 
-    // Store logged-in user and redirect
-localStorage.setItem('loggedInUser', JSON.stringify(user));
-window.location.href = 'dashboard.html';
-        
+            // Store logged-in user and redirect
+            localStorage.setItem('loggedInUser', JSON.stringify(user));
+            window.location.href = 'dashboard.html';
+        }
+
         // Forgot Password Request
         function forgotPassword() {
             const username = prompt('Enter your username:');
@@ -167,6 +168,12 @@ window.location.href = 'dashboard.html';
             
             if (!username || !email) {
                 alert('⚠️ Both fields are required!');
+                return;
+            }
+
+            const user = users.find(u => u.username === username && u.email === email);
+            if (!user) {
+                alert('❌ No matching account found.');
                 return;
             }
 
@@ -182,6 +189,12 @@ window.location.href = 'dashboard.html';
 
             if (!username || !email) {
                 alert('⚠️ Both fields are required!');
+                return;
+            }
+
+            const user = users.find(u => u.username === username && u.email === email);
+            if (!user) {
+                alert('❌ No matching account found.');
                 return;
             }
 
