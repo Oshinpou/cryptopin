@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CryptoPin Profile</title>
+    <title>PinAdmin User Profile</title>
     <style>
         body {
             margin: 0;
@@ -10,50 +10,77 @@
             background-color: #f4f4f4;
         }
         .container {
-            width: 80%;
+            width: 60%;
             margin: 50px auto;
-        }
-        .profile-container {
-            margin-top: 20px;
             background: #fff;
             padding: 20px;
             border-radius: 5px;
             border: 1px solid #ddd;
         }
-        .follow-btn {
+        h2, p {
+            color: #333;
+        }
+        .profile-section {
+            margin-top: 20px;
+        }
+        .profile-link {
+            margin-top: 15px;
             background-color: #3897f0;
             color: #fff;
-            padding: 10px 20px;
+            padding: 10px 15px;
+            text-decoration: none;
             border-radius: 5px;
-            cursor: pointer;
+        }
+        .profile-link:hover {
+            background-color: #357ae8;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Profile Details</h2>
-        <div id="profileContainer" class="profile-container"></div>
+        <h2>User Profile</h2>
+        <div class="profile-section">
+            <p><strong>Username:</strong> <span id="username"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <p><strong>Profile Link:</strong> <a id="profileLink" class="profile-link" target="_blank">View Profile</a></p>
+        </div>
     </div>
 
     <script>
-        let users = JSON.parse(localStorage.getItem('users')) || [];
+        // Get user code from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const profileCode = urlParams.get('code');
-        const foundUser = users.find(user => user.code === profileCode);
+        const userCode = urlParams.get('code');
+        let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        if (!foundUser) {
-            document.getElementById('profileContainer').innerHTML = '<p>Profile not found!</p>';
+        // Find user by code
+        const user = users.find(user => user.code === userCode);
+
+        if (user) {
+            document.getElementById('username').innerText = user.username;
+            document.getElementById('email').innerText = user.email;
+            const profileLink = generateProfileLink(user.username, user.code);
+
+            // Display profile link
+            document.getElementById('profileLink').href = profileLink;
+            document.getElementById('profileLink').innerText = profileLink;
+
+            // Update user profile link in local storage (CRM)
+            updateUserProfileLink(user.username, profileLink);
         } else {
-            document.getElementById('profileContainer').innerHTML = `
-                <h3>Username: ${foundUser.username}</h3>
-                <p>Email: ${foundUser.email}</p>
-                <button class="follow-btn" onclick="followUser('${foundUser.username}')">Follow</button>
-            `;
+            document.querySelector('.container').innerHTML = `<h2>Profile Not Found</h2>`;
         }
 
-        function followUser(username) {
-            alert(`You are now following ${username}`);
+        // Generate unique profile link
+        function generateProfileLink(username, code) {
+            return `${window.location.origin}/profile.html?code=${code}`;
+        }
+
+        // Update profile link in CRM
+        function updateUserProfileLink(username, profileLink) {
+            let storedProfiles = JSON.parse(localStorage.getItem('userProfiles')) || {};
+            storedProfiles[username] = profileLink;
+            localStorage.setItem('userProfiles', JSON.stringify(storedProfiles));
         }
     </script>
 </body>
