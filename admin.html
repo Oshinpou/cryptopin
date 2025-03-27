@@ -14,61 +14,47 @@
             padding: 20px;
             border-radius: 10px;
             width: 90%;
-            max-width: 600px;
             margin: 5% auto;
             color: #fff;
         }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: none;
-        }
-        button {
-            background-color: #D4AF37;
-            color: #000;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #b7952c;
-        }
-        .search-bar {
-            width: 90%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
         .user-list {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
+            border-top: 1px solid #555;
         }
         .user-item {
             padding: 10px;
             border-bottom: 1px solid #444;
             color: #D4AF37;
-            display: flex;
-            justify-content: space-between;
         }
-        .delete-btn {
-            background-color: #ff4d4d;
-            color: white;
+        .btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
         }
         .view-btn {
-            background-color: #4caf50;
-            color: white;
+            background-color: #5cb85c;
+            color: #fff;
+        }
+        .delete-btn {
+            background-color: #d9534f;
+            color: #fff;
+        }
+        .search-bar {
+            width: 90%;
+            padding: 10px;
+            margin-top: 10px;
             border-radius: 5px;
-            cursor: pointer;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
 
     <div class="admin-container">
-        <h2>Admin Panel - User Management</h2>
+        <h2>Crypto Pin - Admin Panel</h2>
         <input type="text" class="search-bar" id="searchBar" placeholder="Search by Username" onkeyup="searchUser()">
         <div class="user-list" id="userList"></div>
     </div>
@@ -76,41 +62,41 @@
     <script>
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // Display Users in Admin Panel
-        function displayUsers(userList) {
+        // Display Users
+        function displayUsers(usersList) {
             const userListContainer = document.getElementById('userList');
             userListContainer.innerHTML = '';
 
-            userList.forEach(user => {
+            usersList.forEach(user => {
                 userListContainer.innerHTML += `
                     <div class="user-item">
-                        <div>
-                            <strong>${user.username}</strong> | ${user.email}
-                        </div>
-                        <div>
-                            <button class="view-btn" onclick="viewProfile('${user.username}')">View Profile</button>
-                            <button class="delete-btn" onclick="deleteUser('${user.username}')">Delete</button>
-                        </div>
+                        <strong>${user.username}</strong> | ${user.email}
+                        <br>Profile Link: <a href="${user.profileLink}.html" target="_blank">${user.profileLink}</a>
+                        <br>
+                        <button class="btn view-btn" onclick="viewProfile('${user.username}')">View Profile</button>
+                        <button class="btn delete-btn" onclick="deleteUser('${user.username}')">Delete</button>
                     </div>`;
             });
         }
 
-        // View Profile with Password and Link
+        // View Profile Details
         function viewProfile(username) {
             const user = users.find(u => u.username === username);
             if (user) {
                 alert(`
-🔗 Profile Link: ${user.profileLink}
+🔗 Profile Link: ${user.profileLink}.html
 🔐 Password: ${user.password}
                 `);
+            } else {
+                alert('❌ User not found.');
             }
         }
 
-        // Delete User by Admin
+        // Delete User
         function deleteUser(username) {
             users = users.filter(user => user.username !== username);
             localStorage.setItem('users', JSON.stringify(users));
-            alert('🗑️ User deleted successfully.');
+            alert('🗑️ Account deleted.');
             displayUsers(users);
         }
 
@@ -121,7 +107,7 @@
             displayUsers(filteredUsers);
         }
 
-        // Initial Display
+        // Initial Display of Users
         displayUsers(users);
     </script>
 </body>
