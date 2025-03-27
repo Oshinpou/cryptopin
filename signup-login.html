@@ -24,7 +24,7 @@
             border-radius: 5px;
             text-align: center;
         }
-        h2 {
+        h2, h3 {
             font-size: 24px;
             margin-bottom: 20px;
             color: #262626;
@@ -66,12 +66,24 @@
         .link a:hover {
             text-decoration: underline;
         }
+        #profile-container {
+            display: none;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #dbdbdb;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #logoutBtn {
+            background-color: #ff4d4d;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="form-container" id="mainForm">
+        <!-- Sign Up / Login Form -->
+        <div class="form-container" id="form-container">
             <h2>CryptoPin Social Login</h2>
 
             <!-- Sign Up Form -->
@@ -92,15 +104,21 @@
             </form>
 
             <div id="error" class="error-msg"></div>
-
+            
             <div class="link">
                 <a href="#" onclick="forgotPassword()">Forgot Password?</a> |
                 <a href="#" onclick="deleteAccountRequest()">Delete Account</a>
             </div>
         </div>
 
-        <!-- Profile Container (Dynamically generated content) -->
-        <div id="profileContainer" class="form-container" style="display: none;"></div>
+        <!-- Profile Container -->
+        <div id="profile-container">
+            <h2>Welcome, <span id="profileUsername"></span>!</h2>
+            <p>Your unique profile link:</p>
+            <a id="profileLink" href="#" target="_blank"></a>
+            <br><br>
+            <button id="logoutBtn" onclick="logout()">Logout</button>
+        </div>
     </div>
 
     <script>
@@ -108,18 +126,18 @@
         let users = JSON.parse(localStorage.getItem('users')) || [];
         let requests = JSON.parse(localStorage.getItem('requests')) || [];
 
-        // Generate a Unique Profile Link for Each User
+        // Unique ID Generator for Profile Link
         function generateUniqueLink(username) {
             const uniqueID = Date.now() + Math.floor(Math.random() * 10000);
             return `?user=${encodeURIComponent(username)}-${uniqueID}`;
         }
 
-        // Sign Up with Profile Link
+        // Sign Up with Link Generation
         function signUp() {
             const username = document.getElementById('signupUsername').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value.trim();
-
+            
             if (!username || !email || !password) {
                 alert('⚠️ All fields are required!');
                 return;
@@ -130,21 +148,20 @@
                 return;
             }
 
-            // Generate a unique profile link
+            // Generate unique profile link
             const uniqueLink = generateUniqueLink(username);
 
-            // Create a new user with profile link
+            // Create a new user with unique link
             users.push({ username, email, password, uniqueLink });
             localStorage.setItem('users', JSON.stringify(users));
-
-            alert(`✅ Sign Up Successful! Your Profile Link: ${window.location.href.split('?')[0]}${uniqueLink}`);
+            alert('✅ Sign Up Successful! You can now log in.');
         }
 
-        // Login and Redirect to Profile
+        // Login and Load Profile on Same Page
         function login() {
             const usernameOrEmail = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
-
+            
             if (!usernameOrEmail || !password) {
                 alert('⚠️ Both fields are required!');
                 return;
@@ -160,16 +177,37 @@
                 return;
             }
 
-            // Store logged-in user and redirect to profile
+            // Store logged-in user and update URL without reloading
             localStorage.setItem('loggedInUser', JSON.stringify(user));
-            window.location.href = user.uniqueLink;
+            window.history.pushState({}, '', user.uniqueLink);
+            loadProfileData();
+        }
+
+        // Load Profile Data Dynamically
+        function loadProfileData() {
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (loggedInUser) {
+                document.getElementById('form-container').style.display = 'none';
+                document.getElementById('profile-container').style.display = 'block';
+                document.getElementById('profileUsername').innerText = loggedInUser.username;
+                document.getElementById('profileLink').innerText = window.location.href;
+                document.getElementById('profileLink').href = window.location.href;
+            }
+        }
+
+        // Logout and Clear Data
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.history.pushState({}, '', '/');
+            document.getElementById('form-container').style.display = 'block';
+            document.getElementById('profile-container').style.display = 'none';
         }
 
         // Forgot Password Request
         function forgotPassword() {
             const username = prompt('Enter your username:');
             const email = prompt('Enter your email:');
-
+            
             if (!username || !email) {
                 alert('⚠️ Both fields are required!');
                 return;
@@ -195,40 +233,13 @@
             alert('🗑️ Delete request submitted.');
         }
 
-        // Load and Display Profile Data Dynamically
-        function loadProfileData() {
-            const params = new URLSearchParams(window.location.search);
-            const userParam = params.get('user');
-
-            if (!userParam) {
-                return;
+        // Check URL and Load Profile if Logged In
+        window.onload = function () {
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (loggedInUser) {
+                loadProfileData();
             }
-
-            const username = userParam.split('-')[0]; // Extract username from URL
-            const user = users.find(u => u.username === username);
-
-            if (user) {
-                document.getElementById('mainForm').style.display = 'none';
-                document.getElementById('profileContainer').style.display = 'block';
-                document.getElementById('profileContainer').innerHTML = `
-                    <h3>Welcome, ${user.username}!</h3>
-                    <p><strong>Email:</strong> ${user.email}</p>
-                    <p><strong>Your Unique Profile Link:</strong><br>
-                        <a href="${window.location.href}">${window.location.href}</a>
-                    </p>
-                    <button onclick="logout()">Logout</button>
-                `;
-            }
-        }
-
-        // Logout and Return to Main Form
-        function logout() {
-            localStorage.removeItem('loggedInUser');
-            window.location.href = window.location.href.split('?')[0];
-        }
-
-        // Load profile data if URL contains a valid user
-        window.onload = loadProfileData;
+        };
     </script>
 </body>
 </html>
