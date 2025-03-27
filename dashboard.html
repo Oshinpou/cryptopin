@@ -6,8 +6,8 @@
         body {
             margin: 0;
             padding: 0;
-            background: #f4f4f4;
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
         .container {
             width: 80%;
@@ -16,17 +16,11 @@
         h2, h3 {
             color: #333;
         }
-        .search-container {
-            margin-bottom: 20px;
-        }
-        input[type="text"], button {
+        input, button {
             padding: 10px;
             margin-top: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-        }
-        input[type="text"] {
-            width: 70%;
         }
         button {
             background-color: #3897f0;
@@ -36,28 +30,6 @@
         button:hover {
             background-color: #357ae8;
         }
-        #myProfileContainer {
-            margin-top: 20px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .post-container {
-            background: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            margin-top: 10px;
-        }
-        .profile-link {
-            color: #3897f0;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .profile-link:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -65,97 +37,26 @@
     <div class="container">
         <h2>Welcome to CryptoPin Dashboard</h2>
 
-        <!-- Search Container -->
-        <div class="search-container">
-            <input type="text" id="searchUsername" placeholder="Search Username or Profile Code">
-            <button onclick="searchUser()">Search</button>
-        </div>
+        <!-- Search Bar -->
+        <input type="text" id="searchInput" placeholder="Enter Username or Profile Code">
+        <button onclick="searchProfile()">Search</button>
 
-        <!-- My Profile Container -->
-        <div id="myProfileContainer"></div>
-
-        <h3>My Posts</h3>
-        <div id="myPosts"></div>
     </div>
 
     <script>
-        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
         let users = JSON.parse(localStorage.getItem('users')) || [];
-        let profileCodes = JSON.parse(localStorage.getItem('profileCodes')) || {};
 
-        // Check if user is logged in
-        if (!loggedInUser) {
-            window.location.href = 'login.html';
-        }
+        function searchProfile() {
+            const searchValue = document.getElementById('searchInput').value.trim();
+            const foundUser = users.find(user => user.username === searchValue || user.code === searchValue);
 
-        // Display Logged-in User Profile and Generate Unique Profile Link
-        function loadMyProfile() {
-            let myProfileCode = profileCodes[loggedInUser.username];
-            
-            if (!myProfileCode) {
-                myProfileCode = generateUniqueCode();
-                profileCodes[loggedInUser.username] = myProfileCode;
-                localStorage.setItem('profileCodes', JSON.stringify(profileCodes));
-            }
-
-            const profileLink = `${window.location.origin}/profile.html?code=${myProfileCode}`;
-            
-            document.getElementById('myProfileContainer').innerHTML = `
-                <div class="user-profile">
-                    <h3>My Profile</h3>
-                    <p><strong>Username:</strong> <a class="profile-link" href="profile.html?code=${myProfileCode}" target="_blank">${loggedInUser.username}</a></p>
-                    <p><strong>Email:</strong> ${loggedInUser.email}</p>
-                    <p><strong>Profile Link:</strong> <a class="profile-link" href="${profileLink}" target="_blank">${profileLink}</a></p>
-                </div>
-            `;
-        }
-
-        // Search and Redirect to Profile Page
-        function searchUser() {
-            const searchValue = document.getElementById('searchUsername').value.trim();
-
-            // Search by username
-            const foundUser = users.find(user => user.username === searchValue);
-
-            // Search by profile code
-            const foundUsernameByCode = Object.keys(profileCodes).find(key => profileCodes[key] === searchValue);
-
-            if (foundUser) {
-                // If found by username
-                const profileCode = profileCodes[foundUser.username];
-                window.location.href = `profile.html?code=${profileCode}`;
-            } else if (foundUsernameByCode) {
-                // If found by profile code
-                window.location.href = `profile.html?code=${searchValue}`;
-            } else {
-                alert('❌ User not found.');
-            }
-        }
-
-        // Generate Unique 6-Digit Profile Code
-        function generateUniqueCode() {
-            return `CP-${Math.floor(100000 + Math.random() * 900000)}`;
-        }
-
-        // Load My Posts (for current logged-in user)
-        function loadMyPosts() {
-            let myPosts = JSON.parse(localStorage.getItem(`posts-${loggedInUser.username}`)) || [];
-            const postsContainer = document.getElementById('myPosts');
-            if (myPosts.length === 0) {
-                postsContainer.innerHTML = `<p>No posts yet.</p>`;
+            if (!foundUser) {
+                alert('Profile not found!');
                 return;
             }
-            postsContainer.innerHTML = myPosts.map(post => `
-                <div class="post-container">
-                    <p>${post}</p>
-                </div>
-            `).join('');
-        }
 
-        window.onload = () => {
-            loadMyProfile();
-            loadMyPosts();
-        };
+            window.location.href = `profile.html?code=${foundUser.code}`;
+        }
     </script>
 </body>
 </html>
