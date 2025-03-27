@@ -11,7 +11,7 @@
         }
         #dashboard {
             width: 90%;
-            max-width: 700px;
+            max-width: 900px;
             margin: 50px auto;
             background: #fff;
             padding: 20px;
@@ -40,6 +40,7 @@
             color: #fff;
             border: none;
             cursor: pointer;
+            border-radius: 5px;
         }
         .btn:hover {
             background-color: #218838;
@@ -133,9 +134,27 @@
     </div>
 
     <script>
-        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        let allUsers = JSON.parse(localStorage.getItem('allUsers')) || [];
+        // IndexedDB for better profile management
+        let db;
+        const request = indexedDB.open('CryptoPinDB', 1);
 
+        request.onerror = function(event) {
+            console.error("Database error: ", event.target.error);
+        };
+
+        request.onsuccess = function(event) {
+            db = event.target.result;
+            console.log("Database initialized successfully.");
+        };
+
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+            const objectStore = db.createObjectStore("profiles", { keyPath: "username" });
+            objectStore.createIndex("username", "username", { unique: true });
+        };
+
+        // Check for logged-in user
+        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
         window.onload = function() {
             if (loggedInUser) {
                 loadUserProfile();
@@ -181,13 +200,36 @@
 
         function searchUser() {
             const username = document.getElementById('searchUsername').value.trim();
-            const foundUser = allUsers.find(user => user.username === username);
-            if (foundUser) {
-                alert('Viewing ' + username + "'s profile as visitor.");
-                window.location.href = `?view=${username}`;
-            } else {
-                alert('User not found.');
+            if (!username) {
+                alert('Enter a valid username');
+                return;
             }
+            const transaction = db.transaction(["profiles"], "readonly");
+            const objectStore = transaction.objectStore("profiles");
+            const request = objectStore.get(username);
+
+            request.onsuccess = function(event) {
+                const userProfile = event.target.result;
+                if (userProfile) {
+                    viewProfileAsVisitor(userProfile);
+                } else {
+                    alert('No profile found with username: ' + username);
+                }
+            };
+
+            request.onerror = function(event) {
+                alert('Error searching profile.');
+            };
+        }
+
+        function viewProfileAsVisitor(userProfile) {
+            document.getElementById('username').innerText = userProfile.username;
+            document.getElementById('bioDisplay').innerText = userProfile.bio || 'No bio available.';
+            document.getElementById('profileImg').src = userProfile.profileImg || 'default.jpg';
+            document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
+                btn.style.display = 'none';
+            });
+            alert('Viewing ' + userProfile.username + "'s profile as visitor.");
         }
 
         function generateShareLink() {
@@ -201,13 +243,9 @@
         }
 
         function updateUser(user) {
-            const index = allUsers.findIndex(u => u.username === user.username);
-            if (index !== -1) {
-                allUsers[index] = user;
-            } else {
-                allUsers.push(user);
-            }
-            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+            const transaction = db.transaction(["profiles"], "readwrite");
+            const objectStore = transaction.objectStore("profiles");
+            objectStore.put(user);
             localStorage.setItem('loggedInUser', JSON.stringify(user));
             loadUserProfile();
         }
@@ -215,26 +253,92 @@
         function loadFollowData() {
             document.getElementById('followerCount').innerText = loggedInUser.followers ? loggedInUser.followers.length : 0;
             document.getElementById('followingCount').innerText = loggedInUser.following ? loggedInUser.following.length : 0;
-            displayFollowers();
-            displayFollowing();
-        }
 
-        function displayFollowers() {
             const followersList = document.getElementById('followersList');
+            const followingList = document.getElementById('followingList');
+
             followersList.innerHTML = '';
-            (loggedInUser.followers || []).forEach(follower => {
-                followersList.innerHTML += `<div class="profile-item">${follower}</div>`;
-            });
+            followingList.innerHTML = '';
+
+            if (loggedInUser.followers) {
+                loggedInUser.followers.forEach(username => {
+                    followersList.innerHTML += `<div class="profile-item">${username}</div>`;
+                });
+            }
+
+            if (loggedInUser.following) {
+                loggedInUser.following.forEach(username => {
+                    followingList.innerHTML += `<div class="profile-item">${username}</div>`;
+                });
+            }
         }
 
-        function displayFollowing() {
-            const followingList = document.getElementById('followingList');
-            followingList.innerHTML = '';
-            (loggedInUser.following || []).forEach(following => {
-                followingList.innerHTML += `<div class="profile-item">${following}</div>`;
-            });
+        // Follow/Unfollow functionality
+        function followUser(username) {
+            if (!loggedInUser.following.includes(username)) {
+                loggedInUser.following.push(username);
+                updateUser(loggedInUser);
+                alert('You are now following ' + username);
+                loadFollowData();
+            } else {
+                alert('You are already following ' + username);
+            }
         }
+
+        function unfollowUser(username) {
+            const index = loggedInUser.following.indexOf(username);
+            if (index !== -1) {
+                loggedInUser.following.splice(index, 1);
+                updateUser(loggedInUser);
+                alert('Unfollowed ' + username);
+                loadFollowData();
+            }
+        }
+
+        // Generate dynamic profile link for visitors
+        function generateVisitorProfileLink(username) {
+            return `${window.location.origin}/dashboard.html?view=${username}`;
+        }
+
+        // Parse URL parameters to check if viewing as a visitor
+        function checkVisitorProfile() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewUsername = urlParams.get('view');
+
+            if (viewUsername) {
+                viewVisitorProfile(viewUsername);
+            }
+        }
+
+        function viewVisitorProfile(username) {
+            const transaction = db.transaction(["profiles"], "readonly");
+            const objectStore = transaction.objectStore("profiles");
+            const request = objectStore.get(username);
+
+            request.onsuccess = function(event) {
+                const userProfile = event.target.result;
+                if (userProfile) {
+                    document.getElementById('username').innerText = userProfile.username;
+                    document.getElementById('bioDisplay').innerText = userProfile.bio || 'No bio available.';
+                    document.getElementById('profileImg').src = userProfile.profileImg || 'default.jpg';
+                    document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
+                        btn.style.display = 'none';
+                    });
+
+                    if (loggedInUser && loggedInUser.username !== userProfile.username) {
+                        document.getElementById('followBtn').style.display = 'block';
+                    }
+                } else {
+                    alert('Profile not found.');
+                    window.location.href = 'dashboard.html';
+                }
+            };
+        }
+
+        // Auto-check for visitor profile view
+        checkVisitorProfile();
 
     </script>
+
 </body>
 </html>
