@@ -57,6 +57,12 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .view-btn {
+            background-color: #4caf50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -81,9 +87,23 @@
                         <div>
                             <strong>${user.username}</strong> | ${user.email}
                         </div>
-                        <button class="delete-btn" onclick="deleteUser('${user.username}')">Delete</button>
+                        <div>
+                            <button class="view-btn" onclick="viewProfile('${user.username}')">View Profile</button>
+                            <button class="delete-btn" onclick="deleteUser('${user.username}')">Delete</button>
+                        </div>
                     </div>`;
             });
+        }
+
+        // View Profile with Password and Link
+        function viewProfile(username) {
+            const user = users.find(u => u.username === username);
+            if (user) {
+                alert(`
+🔗 Profile Link: ${user.profileLink}
+🔐 Password: ${user.password}
+                `);
+            }
         }
 
         // Delete User by Admin
