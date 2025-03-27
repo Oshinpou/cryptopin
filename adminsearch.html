@@ -1,84 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Panel - User Profiles</title>
+    <title>CryptoPin Admin Search</title>
     <style>
         body {
-            margin: 0;
-            padding: 20px;
-            background: #f4f4f4;
             font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .profile-list {
-            list-style-type: none;
+            background-color: #f4f4f4;
+            margin: 0;
             padding: 0;
         }
-        .profile-list li {
-            background: #f9f9f9;
-            margin-bottom: 10px;
-            padding: 10px;
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
             border-radius: 5px;
-            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-        a:hover {
-            text-decoration: underline;
+        button {
+            background-color: #3897f0;
+            color: #fff;
+            cursor: pointer;
         }
-        .no-profiles {
-            text-align: center;
-            color: #888;
+        button:hover {
+            background-color: #357ae8;
+        }
+        #result {
+            margin-top: 10px;
+            color: green;
+        }
+        #error {
+            margin-top: 10px;
+            color: red;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Admin Panel - User Profiles</h2>
-    <ul id="profileList" class="profile-list"></ul>
-    <p id="noProfiles" class="no-profiles" style="display:none;">No profiles found.</p>
-</div>
+    <div class="container">
+        <h2>CryptoPin Admin Search</h2>
+        <input type="text" id="searchInput" placeholder="Enter Username or Profile Code" />
+        <button onclick="searchProfile()">Search</button>
+        <p id="result"></p>
+        <p id="error"></p>
+    </div>
 
-<script>
-    // Load Admin Data
-    function loadProfiles() {
-        const adminData = JSON.parse(localStorage.getItem('adminData')) || [];
+    <script>
+        // Load user data from localStorage
+        let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        const profileList = document.getElementById('profileList');
-        const noProfiles = document.getElementById('noProfiles');
+        function searchProfile() {
+            const searchValue = document.getElementById('searchInput').value.trim();
+            if (!searchValue) {
+                document.getElementById('error').innerText = "⚠️ Please enter a username or profile code.";
+                return;
+            }
 
-        if (adminData.length === 0) {
-            noProfiles.style.display = 'block';
-        } else {
-            adminData.forEach(profile => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <strong>${profile.username}</strong> - 
-                    <a href="${profile.uniqueLink}" target="_blank">View Profile</a>
-                `;
-                profileList.appendChild(li);
-            });
+            // Search for matching username or code
+            const foundUser = users.find(user => user.username === searchValue || user.code === searchValue);
+
+            if (!foundUser) {
+                document.getElementById('error').innerText = "❌ Profile not found!";
+                document.getElementById('result').innerText = "";
+            } else {
+                document.getElementById('result').innerHTML = `✅ Profile found: 
+                <a href="${foundUser.uniqueLink}" target="_blank">${foundUser.uniqueLink}</a>`;
+                document.getElementById('error').innerText = "";
+            }
         }
-    }
-
-    // Load Profiles on Page Load
-    window.onload = loadProfiles;
-</script>
-
+    </script>
 </body>
 </html>
