@@ -13,7 +13,7 @@
             background: rgba(34, 34, 34, 0.9);
             padding: 20px;
             border-radius: 10px;
-            width: 320px;
+            width: 350px;
             margin: 5% auto;
             text-align: center;
             color: #fff;
@@ -42,11 +42,14 @@
             color: #D4AF37;
             cursor: pointer;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Form Container -->
+    <!-- Main Container -->
     <div class="container" id="form-container">
         <h2>Crypto Pin - Social Hub</h2>
 
@@ -65,6 +68,29 @@
             <input type="text" id="loginUsername" placeholder="Enter Username" required>
             <input type="password" id="loginPassword" placeholder="Enter Password" required>
             <button type="button" onclick="login()">Login</button>
+        </form>
+
+        <!-- Recover Password -->
+        <div class="link" onclick="showRecoverForm()">Forgot Password?</div>
+
+        <!-- Recover Password Form -->
+        <form id="recoverForm" class="hidden">
+            <h3>Recover Password</h3>
+            <input type="text" id="recoverUsername" placeholder="Enter Username" required>
+            <input type="email" id="recoverEmail" placeholder="Enter Email" required>
+            <button type="button" onclick="recoverPassword()">Recover</button>
+        </form>
+
+        <!-- Delete Account -->
+        <div class="link" onclick="showDeleteForm()">Delete Account</div>
+
+        <!-- Delete Account Form -->
+        <form id="deleteForm" class="hidden">
+            <h3>Delete Account</h3>
+            <input type="text" id="deleteUsername" placeholder="Enter Username" required>
+            <input type="email" id="deleteEmail" placeholder="Enter Email" required>
+            <input type="password" id="deletePassword" placeholder="Enter Password" required>
+            <button type="button" onclick="deleteAccount()">Delete Account</button>
         </form>
 
         <div id="error" class="error-msg"></div>
@@ -118,7 +144,48 @@
             window.location.href = `?user=${user.username}`;
         }
 
-        // Check if Logged In
+        // Recover Password
+        function recoverPassword() {
+            const username = document.getElementById('recoverUsername').value.trim();
+            const email = document.getElementById('recoverEmail').value.trim();
+
+            const user = users.find(u => u.username === username && u.email === email);
+            if (!user) {
+                alert('❌ User not found or invalid details.');
+                return;
+            }
+
+            alert(`✅ Password for ${username} is: ${user.password}`);
+        }
+
+        // Delete Account
+        function deleteAccount() {
+            const username = document.getElementById('deleteUsername').value.trim();
+            const email = document.getElementById('deleteEmail').value.trim();
+            const password = document.getElementById('deletePassword').value.trim();
+
+            const userIndex = users.findIndex(u => u.username === username && u.email === email && u.password === password);
+            if (userIndex === -1) {
+                alert('❌ User not found or incorrect details.');
+                return;
+            }
+
+            users.splice(userIndex, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            alert(`✅ Account for ${username} deleted successfully.`);
+        }
+
+        // Show Recover Form
+        function showRecoverForm() {
+            document.getElementById('recoverForm').classList.toggle('hidden');
+        }
+
+        // Show Delete Form
+        function showDeleteForm() {
+            document.getElementById('deleteForm').classList.toggle('hidden');
+        }
+
+        // Auto Redirect to Profile if Logged In
         const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
         if (loggedInUser) {
             window.location.href = `?user=${loggedInUser.username}`;
