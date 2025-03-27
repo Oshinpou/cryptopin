@@ -28,6 +28,17 @@
             margin-top: 50px;
             color: red;
         }
+        .logout-btn {
+            padding: 10px 15px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            background-color: #e04444;
+        }
     </style>
 </head>
 <body>
@@ -38,6 +49,7 @@
             <p><strong>Username:</strong> <span id="username"></span></p>
             <p><strong>Email:</strong> <span id="email"></span></p>
             <p><strong>Profile Link:</strong> <a id="profileLink" target="_blank"></a></p>
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
         <div id="errorSection" class="error" style="display: none;">
             <h2>Profile Not Found</h2>
@@ -46,24 +58,43 @@
     </div>
 
     <script>
-        // Get user code from URL
+        // Get profile code from URL
         const urlParams = new URLSearchParams(window.location.search);
         const userCode = urlParams.get('code');
 
-        // Get stored users and profiles
+        // Get stored users and logged-in user
         let users = JSON.parse(localStorage.getItem('users')) || [];
+        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
 
-        // Find user by unique code
-        const user = users.find(user => user.code === userCode);
+        // Check if a valid user is logged in
+        if (!loggedInUser || !loggedInUser.code || loggedInUser.code !== userCode) {
+            const user = users.find(user => user.code === userCode);
+            if (user) {
+                // Store logged-in user and display profile
+                localStorage.setItem('loggedInUser', JSON.stringify(user));
+                loadUserProfile(user);
+            } else {
+                // Show profile not found
+                document.getElementById('errorSection').style.display = 'block';
+            }
+        } else {
+            // Load existing logged-in user profile
+            loadUserProfile(loggedInUser);
+        }
 
-        if (user) {
+        // Load user profile into HTML
+        function loadUserProfile(user) {
             document.getElementById('username').innerText = user.username;
             document.getElementById('email').innerText = user.email;
             document.getElementById('profileLink').innerText = user.link;
             document.getElementById('profileLink').href = user.link;
             document.getElementById('profileSection').style.display = 'block';
-        } else {
-            document.getElementById('errorSection').style.display = 'block';
+        }
+
+        // Logout and clear logged-in user
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'admin.html';
         }
     </script>
 </body>
