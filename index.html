@@ -1,127 +1,116 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CryptoPin - Sign Up & Login</title>
+    <title>Crypto Pin - Sign Up / Login</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
+            background: #1a1a1a;
+            font-family: Arial, sans-serif;
         }
-        .container {
-            width: 50%;
-            margin: 50px auto;
-            background-color: #fff;
+        .form-container {
+            background: rgba(34, 34, 34, 0.9);
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h2 {
+            border-radius: 10px;
+            width: 320px;
+            margin: 5% auto;
             text-align: center;
-            color: #333;
+            color: #fff;
         }
         input, button {
             width: 100%;
             padding: 10px;
             margin-top: 10px;
-            border: 1px solid #ccc;
             border-radius: 5px;
+            border: none;
         }
         button {
-            background-color: #3897f0;
-            color: #fff;
+            background-color: #D4AF37;
+            color: #000;
             cursor: pointer;
         }
         button:hover {
-            background-color: #357ae8;
+            background-color: #b7952c;
         }
-        #status {
+        .error-msg {
+            color: #ff4d4d;
             margin-top: 10px;
-            color: green;
-        }
-        #error {
-            margin-top: 10px;
-            color: red;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Welcome to CryptoPin</h2>
+    <!-- Form Container -->
+    <div class="form-container" id="form-container">
+        <h2>Crypto Pin - Social Hub</h2>
 
-        <!-- Sign Up Section -->
-        <h3>Create Your Account</h3>
-        <input type="text" id="signupUsername" placeholder="Enter Username" />
-        <button onclick="registerUser()">Sign Up</button>
-        <p id="signupStatus"></p>
+        <!-- Sign Up Form -->
+        <form id="signupForm">
+            <h3>Sign Up</h3>
+            <input type="text" id="signupUsername" placeholder="Enter Username" required>
+            <input type="email" id="signupEmail" placeholder="Enter Email" required>
+            <input type="password" id="signupPassword" placeholder="Enter Password" required>
+            <button type="button" onclick="signUp()">Sign Up</button>
+        </form>
 
-        <!-- Login Section -->
-        <h3>Login to Your Account</h3>
-        <input type="text" id="loginUsername" placeholder="Enter Username" />
-        <button onclick="loginUser()">Log In</button>
-        <p id="loginStatus"></p>
+        <!-- Login Form -->
+        <form id="loginForm">
+            <h3>Login</h3>
+            <input type="text" id="loginUsername" placeholder="Enter Username" required>
+            <input type="password" id="loginPassword" placeholder="Enter Password" required>
+            <button type="button" onclick="login()">Login</button>
+        </form>
+
+        <div id="error" class="error-msg"></div>
     </div>
 
     <script>
-        // Fetch users from localStorage or initialize empty array
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
         // Sign Up Function
-        function registerUser() {
+        function signUp() {
             const username = document.getElementById('signupUsername').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
 
-            if (!username) {
-                document.getElementById('signupStatus').innerText = "⚠️ Please enter a valid username.";
+            if (!username || !email || !password) {
+                alert('⚠️ All fields are required!');
                 return;
             }
 
-            // Check if username already exists
-            if (users.some(user => user.username === username)) {
-                document.getElementById('signupStatus').innerText = "❗️ Username already exists. Try another.";
+            if (users.find(user => user.username === username)) {
+                alert('⚠️ Username already exists.');
                 return;
             }
 
-            // Generate unique profile link
-            const profileCode = Math.random().toString(36).substring(2, 10);
-            const uniqueLink = `https://cryptopin.com/profile/${profileCode}`;
-
-            // Create new user object
-            const newUser = {
-                username: username,
-                code: profileCode,
-                uniqueLink: uniqueLink
-            };
-
-            // Add new user and save to localStorage
+            const profileLink = `profile-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+            const newUser = { username, email, password, profileLink };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
 
-            document.getElementById('signupStatus').innerHTML = `✅ Account created! Your profile link: 
-            <a href="${uniqueLink}" target="_blank">${uniqueLink}</a>`;
-            document.getElementById('signupUsername').value = "";
+            alert('✅ Sign Up Successful! Your profile link: ' + profileLink);
         }
 
         // Login Function
-        function loginUser() {
+        function login() {
             const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
 
-            if (!username) {
-                document.getElementById('loginStatus').innerText = "⚠️ Please enter a valid username.";
+            if (!username || !password) {
+                alert('⚠️ All fields are required!');
                 return;
             }
 
-            // Check if username exists
-            const foundUser = users.find(user => user.username === username);
-
-            if (!foundUser) {
-                document.getElementById('loginStatus').innerText = "❌ Username not found. Please sign up.";
-            } else {
-                document.getElementById('loginStatus').innerHTML = `✅ Welcome back! Your profile link: 
-                <a href="${foundUser.uniqueLink}" target="_blank">${foundUser.uniqueLink}</a>`;
-                document.getElementById('loginUsername').value = "";
+            const user = users.find(u => u.username === username && u.password === password);
+            if (!user) {
+                document.getElementById("error").innerText = "❌ Invalid username or password.";
+                return;
             }
+
+            // Redirect to profile page with unique link
+            localStorage.setItem('loggedInUser', JSON.stringify(user));
+            window.location.href = user.profileLink + ".html";
         }
     </script>
 </body>
