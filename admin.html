@@ -1,146 +1,133 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CryptoPin Admin Panel 1</title>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1204724319985727"
-     crossorigin="anonymous"></script>
-    <meta name="google-adsense-account" content="ca-pub-1204724319985727">
+    <title>Crypto Pin Admin Panel</title>
     <style>
         body {
-            background-color: #1a1a1a;
-            color: white;
+            margin: 0;
+            padding: 0;
+            background: #121212;
             font-family: Arial, sans-serif;
-            margin: 20px;
+            color: #fff;
         }
-        h1, h2 {
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background: #1f1f1f;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        h2 {
             text-align: center;
+            margin-bottom: 20px;
         }
-        input {
+        input, button {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
+            margin-top: 10px;
             border-radius: 5px;
             border: none;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            background: #333;
-            padding: 10px;
-            margin-bottom: 5px;
-            border-radius: 5px;
+        input {
+            background: #2b2b2b;
+            color: #fff;
         }
         button {
             background-color: #D4AF37;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
+            color: #000;
             cursor: pointer;
         }
         button:hover {
             background-color: #b7952c;
         }
-        .error-msg {
-            color: #ff4d4d;
+        .user-list {
+            margin-top: 20px;
+        }
+        .user-item {
+            background: #2b2b2b;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+        }
+        .delete-btn {
+            background: #ff4d4d;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background: #e60000;
+        }
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .search-bar {
+            width: 75%;
         }
     </style>
 </head>
 <body>
-    <h1>CryptoPin Admin Panel 1</h1>
+    <div class="container">
+        <h2>Crypto Pin Admin Panel</h2>
 
-    <!-- Search Bar -->
-    <input type="text" id="searchBar" placeholder="Search by Username or Email" oninput="searchUser()">
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Search by Username">
+            <button onclick="searchUser()">Search</button>
+        </div>
 
-    <h2>Registered Users</h2>
-    <div id="userList"></div>
-
-    <h2>Account Requests</h2>
-    <div id="requestList"></div>
+        <div class="user-list" id="userList"></div>
+    </div>
 
     <script>
-        function loadUsers() {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const requests = JSON.parse(localStorage.getItem('requests')) || [];
+        // Load users from local storage
+        let users = JSON.parse(localStorage.getItem('users')) || [];
 
-            let userListHTML = '<ul>';
-            users.forEach((user, index) => {
-                userListHTML += `
-                    <li>
-                        <strong>Username:</strong> ${user.username} |
-                        <strong>Email:</strong> ${user.email} |
-                        <strong>Password:</strong> ${user.password}
-                        <button onclick="deleteUser(${index})">Delete</button>
-                    </li>
-                `;
-            });
-            userListHTML += '</ul>';
-            document.getElementById('userList').innerHTML = userListHTML;
+        // Display users in admin panel
+        function displayUsers(usersToDisplay) {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
 
-            let requestListHTML = '<ul>';
-            requests.forEach((req, index) => {
-                requestListHTML += `
-                    <li>
-                        <strong>Type:</strong> ${req.type.toUpperCase()} |
-                        <strong>Username:</strong> ${req.username} |
-                        <strong>Email:</strong> ${req.email}
-                        <button onclick="processRequest(${index})">Process</button>
-                    </li>
-                `;
-            });
-            requestListHTML += '</ul>';
-            document.getElementById('requestList').innerHTML = requestListHTML;
-        }
-
-        function deleteUser(index) {
-            let users = JSON.parse(localStorage.getItem('users'));
-            users.splice(index, 1);
-            localStorage.setItem('users', JSON.stringify(users));
-            loadUsers();
-        }
-
-        function processRequest(index) {
-            let requests = JSON.parse(localStorage.getItem('requests'));
-            const req = requests[index];
-            if (req.type === 'delete') {
-                deleteUserByName(req.username);
+            if (usersToDisplay.length === 0) {
+                userList.innerHTML = '<p>No users found.</p>';
+                return;
             }
-            requests.splice(index, 1);
-            localStorage.setItem('requests', JSON.stringify(requests));
-            loadUsers();
-        }
 
-        function deleteUserByName(username) {
-            let users = JSON.parse(localStorage.getItem('users'));
-            users = users.filter(user => user.username !== username);
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-
-        function searchUser() {
-            const searchQuery = document.getElementById('searchBar').value.toLowerCase();
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const filteredUsers = users.filter(user =>
-                user.username.toLowerCase().includes(searchQuery) ||
-                user.email.toLowerCase().includes(searchQuery)
-            );
-
-            let userListHTML = '<ul>';
-            filteredUsers.forEach((user, index) => {
-                userListHTML += `
-                    <li>
-                        <strong>Username:</strong> ${user.username} |
-                        <strong>Email:</strong> ${user.email} |
-                        <strong>Password:</strong> ${user.password}
-                        <button onclick="deleteUser(${index})">Delete</button>
-                    </li>
+            usersToDisplay.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `
+                    <p><strong>Username:</strong> ${user.username}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Profile Link:</strong> <a href="${user.profileLink}" target="_blank">${user.profileLink}</a></p>
+                    <button class="delete-btn" onclick="deleteUser('${user.username}')">Delete Account</button>
                 `;
+                userList.appendChild(userItem);
             });
-            userListHTML += '</ul>';
-            document.getElementById('userList').innerHTML = userListHTML;
         }
 
-        loadUsers();
+        // Initial load of all users
+        displayUsers(users);
+
+        // Search user by username
+        function searchUser() {
+            const searchValue = document.getElementById('searchInput').value.trim().toLowerCase();
+            const filteredUsers = users.filter(user => user.username.toLowerCase().includes(searchValue));
+            displayUsers(filteredUsers);
+        }
+
+        // Delete user by username
+        function deleteUser(username) {
+            if (confirm(`Are you sure you want to delete account: ${username}?`)) {
+                users = users.filter(user => user.username !== username);
+                localStorage.setItem('users', JSON.stringify(users));
+                displayUsers(users);
+                alert('✅ Account deleted successfully.');
+            }
+        }
     </script>
 </body>
 </html>
