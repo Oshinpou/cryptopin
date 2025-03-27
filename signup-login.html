@@ -71,7 +71,7 @@
 <body>
 
     <div class="container">
-        <div class="form-container">
+        <div class="form-container" id="mainForm">
             <h2>CryptoPin Social Login</h2>
 
             <!-- Sign Up Form -->
@@ -92,12 +92,15 @@
             </form>
 
             <div id="error" class="error-msg"></div>
-            
+
             <div class="link">
-                <a href="#" onclick="forgotPassword()">Forgot Password?</a> | 
+                <a href="#" onclick="forgotPassword()">Forgot Password?</a> |
                 <a href="#" onclick="deleteAccountRequest()">Delete Account</a>
             </div>
         </div>
+
+        <!-- Profile Container (Dynamically generated content) -->
+        <div id="profileContainer" class="form-container" style="display: none;"></div>
     </div>
 
     <script>
@@ -105,18 +108,18 @@
         let users = JSON.parse(localStorage.getItem('users')) || [];
         let requests = JSON.parse(localStorage.getItem('requests')) || [];
 
-        // Unique ID Generator
+        // Generate a Unique Profile Link for Each User
         function generateUniqueLink(username) {
             const uniqueID = Date.now() + Math.floor(Math.random() * 10000);
-            return `profile.html?user=${encodeURIComponent(username)}-${uniqueID}`;
+            return `?user=${encodeURIComponent(username)}-${uniqueID}`;
         }
 
-        // Sign Up with Link Generation
+        // Sign Up with Profile Link
         function signUp() {
             const username = document.getElementById('signupUsername').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value.trim();
-            
+
             if (!username || !email || !password) {
                 alert('⚠️ All fields are required!');
                 return;
@@ -127,27 +130,28 @@
                 return;
             }
 
-            // Generate a unique profile link for the new user
+            // Generate a unique profile link
             const uniqueLink = generateUniqueLink(username);
 
-            // Create a new user with unique link
+            // Create a new user with profile link
             users.push({ username, email, password, uniqueLink });
             localStorage.setItem('users', JSON.stringify(users));
-            alert('✅ Sign Up Successful! You can now log in.');
+
+            alert(`✅ Sign Up Successful! Your Profile Link: ${window.location.href.split('?')[0]}${uniqueLink}`);
         }
 
         // Login and Redirect to Profile
         function login() {
             const usernameOrEmail = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
-            
+
             if (!usernameOrEmail || !password) {
                 alert('⚠️ Both fields are required!');
                 return;
             }
 
-            const user = users.find(u => 
-                (u.username === usernameOrEmail || u.email === usernameOrEmail) && 
+            const user = users.find(u =>
+                (u.username === usernameOrEmail || u.email === usernameOrEmail) &&
                 u.password === password
             );
 
@@ -156,24 +160,18 @@
                 return;
             }
 
-            // Store logged-in user and redirect
+            // Store logged-in user and redirect to profile
             localStorage.setItem('loggedInUser', JSON.stringify(user));
-            window.location.href = 'dashboard.html';
+            window.location.href = user.uniqueLink;
         }
 
         // Forgot Password Request
         function forgotPassword() {
             const username = prompt('Enter your username:');
             const email = prompt('Enter your email:');
-            
+
             if (!username || !email) {
                 alert('⚠️ Both fields are required!');
-                return;
-            }
-
-            const user = users.find(u => u.username === username && u.email === email);
-            if (!user) {
-                alert('❌ No matching account found.');
                 return;
             }
 
@@ -192,16 +190,45 @@
                 return;
             }
 
-            const user = users.find(u => u.username === username && u.email === email);
-            if (!user) {
-                alert('❌ No matching account found.');
-                return;
-            }
-
             requests.push({ username, email, type: 'delete' });
             localStorage.setItem('requests', JSON.stringify(requests));
             alert('🗑️ Delete request submitted.');
         }
+
+        // Load and Display Profile Data Dynamically
+        function loadProfileData() {
+            const params = new URLSearchParams(window.location.search);
+            const userParam = params.get('user');
+
+            if (!userParam) {
+                return;
+            }
+
+            const username = userParam.split('-')[0]; // Extract username from URL
+            const user = users.find(u => u.username === username);
+
+            if (user) {
+                document.getElementById('mainForm').style.display = 'none';
+                document.getElementById('profileContainer').style.display = 'block';
+                document.getElementById('profileContainer').innerHTML = `
+                    <h3>Welcome, ${user.username}!</h3>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Your Unique Profile Link:</strong><br>
+                        <a href="${window.location.href}">${window.location.href}</a>
+                    </p>
+                    <button onclick="logout()">Logout</button>
+                `;
+            }
+        }
+
+        // Logout and Return to Main Form
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = window.location.href.split('?')[0];
+        }
+
+        // Load profile data if URL contains a valid user
+        window.onload = loadProfileData;
     </script>
 </body>
 </html>
