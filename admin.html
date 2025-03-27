@@ -1,25 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Crypto Pin Admin Panel</title>
+    <title>Crypto Pin - Admin Panel</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: #121212;
+            background: #1a1a1a;
             font-family: Arial, sans-serif;
-            color: #fff;
         }
-        .container {
-            width: 80%;
-            margin: 50px auto;
-            background: #1f1f1f;
+        .admin-container {
+            background: rgba(34, 34, 34, 0.9);
             padding: 20px;
             border-radius: 10px;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
+            width: 90%;
+            max-width: 600px;
+            margin: 5% auto;
+            color: #fff;
         }
         input, button {
             width: 100%;
@@ -27,10 +24,6 @@
             margin-top: 10px;
             border-radius: 5px;
             border: none;
-        }
-        input {
-            background: #2b2b2b;
-            color: #fff;
         }
         button {
             background-color: #D4AF37;
@@ -40,94 +33,76 @@
         button:hover {
             background-color: #b7952c;
         }
+        .search-bar {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
         .user-list {
-            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
         }
         .user-item {
-            background: #2b2b2b;
             padding: 10px;
-            margin-top: 5px;
-            border-radius: 5px;
-        }
-        .delete-btn {
-            background: #ff4d4d;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-        }
-        .delete-btn:hover {
-            background: #e60000;
-        }
-        .search-container {
+            border-bottom: 1px solid #444;
+            color: #D4AF37;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
         }
-        .search-bar {
-            width: 75%;
+        .delete-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Crypto Pin Admin Panel</h2>
 
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-bar" placeholder="Search by Username">
-            <button onclick="searchUser()">Search</button>
-        </div>
-
+    <div class="admin-container">
+        <h2>Admin Panel - User Management</h2>
+        <input type="text" class="search-bar" id="searchBar" placeholder="Search by Username" onkeyup="searchUser()">
         <div class="user-list" id="userList"></div>
     </div>
 
     <script>
-        // Load users from local storage
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // Display users in admin panel
-        function displayUsers(usersToDisplay) {
-            const userList = document.getElementById('userList');
-            userList.innerHTML = '';
+        // Display Users in Admin Panel
+        function displayUsers(userList) {
+            const userListContainer = document.getElementById('userList');
+            userListContainer.innerHTML = '';
 
-            if (usersToDisplay.length === 0) {
-                userList.innerHTML = '<p>No users found.</p>';
-                return;
-            }
-
-            usersToDisplay.forEach(user => {
-                const userItem = document.createElement('div');
-                userItem.className = 'user-item';
-                userItem.innerHTML = `
-                    <p><strong>Username:</strong> ${user.username}</p>
-                    <p><strong>Email:</strong> ${user.email}</p>
-                    <p><strong>Profile Link:</strong> <a href="${user.profileLink}" target="_blank">${user.profileLink}</a></p>
-                    <button class="delete-btn" onclick="deleteUser('${user.username}')">Delete Account</button>
-                `;
-                userList.appendChild(userItem);
+            userList.forEach(user => {
+                userListContainer.innerHTML += `
+                    <div class="user-item">
+                        <div>
+                            <strong>${user.username}</strong> | ${user.email}
+                        </div>
+                        <button class="delete-btn" onclick="deleteUser('${user.username}')">Delete</button>
+                    </div>`;
             });
         }
 
-        // Initial load of all users
-        displayUsers(users);
+        // Delete User by Admin
+        function deleteUser(username) {
+            users = users.filter(user => user.username !== username);
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('🗑️ User deleted successfully.');
+            displayUsers(users);
+        }
 
-        // Search user by username
+        // Search Users
         function searchUser() {
-            const searchValue = document.getElementById('searchInput').value.trim().toLowerCase();
+            const searchValue = document.getElementById('searchBar').value.toLowerCase();
             const filteredUsers = users.filter(user => user.username.toLowerCase().includes(searchValue));
             displayUsers(filteredUsers);
         }
 
-        // Delete user by username
-        function deleteUser(username) {
-            if (confirm(`Are you sure you want to delete account: ${username}?`)) {
-                users = users.filter(user => user.username !== username);
-                localStorage.setItem('users', JSON.stringify(users));
-                displayUsers(users);
-                alert('✅ Account deleted successfully.');
-            }
-        }
+        // Initial Display
+        displayUsers(users);
     </script>
 </body>
 </html>
