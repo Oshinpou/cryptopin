@@ -1,0 +1,12 @@
+[
+  {
+    "username": "user1",
+    "code": "abc123",
+    "uniqueLink": "https://cryptopin.com/profile/abc123"
+  },
+  {
+    "username": "user2",
+    "code": "xyz456",
+    "uniqueLink": "https://cryptopin.com/profile/xyz456"
+  }
+]
