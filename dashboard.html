@@ -36,18 +36,12 @@
         button:hover {
             background-color: #357ae8;
         }
-        #profileContainer, #myProfileContainer {
+        #myProfileContainer {
             margin-top: 20px;
             background: #fff;
             padding: 15px;
             border-radius: 5px;
             border: 1px solid #ddd;
-        }
-        .user-profile {
-            margin-top: 20px;
-        }
-        .user-profile p {
-            font-size: 16px;
         }
         .post-container {
             background: #fff;
@@ -71,9 +65,6 @@
 
         <!-- My Profile Container -->
         <div id="myProfileContainer"></div>
-
-        <!-- Search Result - Profile View -->
-        <div id="profileContainer"></div>
 
         <h3>My Posts</h3>
         <div id="myPosts"></div>
@@ -103,37 +94,19 @@
             `;
         }
 
-        // Search and View User Profile
+        // Search and Redirect to Profile Page
         function searchUser() {
             const searchUsername = document.getElementById('searchUsername').value.trim();
             const foundUser = users.find(user => user.username === searchUsername);
 
             if (!foundUser) {
-                document.getElementById('profileContainer').innerHTML = `<p>User not found.</p>`;
+                alert('User not found.');
                 return;
             }
 
-            // Get or Generate Unique Code for Profile
-            const uniqueCode = localStorage.getItem(`profileCode-${foundUser.username}`) || generateUniqueCode();
-            localStorage.setItem(`profileCode-${foundUser.username}`, uniqueCode);
-
-            document.getElementById('profileContainer').innerHTML = `
-                <div class="user-profile">
-                    <h3>Profile of ${foundUser.username}</h3>
-                    <p><strong>Email:</strong> ${foundUser.email}</p>
-                    <p><strong>Unique Code:</strong> ${uniqueCode}</p>
-                    <button onclick="viewUserDashboard('${foundUser.username}')">View Dashboard</button>
-                </div>
-            `;
-        }
-
-        // Redirect to the User's Dashboard
-        function viewUserDashboard(username) {
-            const userToView = users.find(user => user.username === username);
-            if (userToView) {
-                localStorage.setItem('viewUser', JSON.stringify(userToView));
-                window.location.href = 'dashboard.html';
-            }
+            // Store user data in localStorage to pass to profile page
+            localStorage.setItem('viewUser', JSON.stringify(foundUser));
+            window.location.href = `profile.html?username=${searchUsername}`;
         }
 
         // Generate Unique Code (6-digit random number)
