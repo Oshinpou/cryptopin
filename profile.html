@@ -1,122 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>User Profile - CryptoPin</title>
+    <title>CryptoPin Profile</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: #f4f4f4;
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
         .container {
-            width: 60%;
+            width: 80%;
             margin: 50px auto;
         }
         .profile-container {
+            margin-top: 20px;
             background: #fff;
             padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        h3, p {
-            margin: 10px 0;
-        }
-        .post-container {
-            background: #fff;
-            padding: 10px;
             border-radius: 5px;
             border: 1px solid #ddd;
-            margin-top: 10px;
         }
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
+        .follow-btn {
             background-color: #3897f0;
             color: #fff;
-            border: none;
+            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-        }
-        button:hover {
-            background-color: #357ae8;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <h2>Profile Details</h2>
         <div id="profileContainer" class="profile-container"></div>
-        <h3>Posts</h3>
-        <div id="userPosts"></div>
     </div>
 
     <script>
+        let users = JSON.parse(localStorage.getItem('users')) || [];
         const urlParams = new URLSearchParams(window.location.search);
         const profileCode = urlParams.get('code');
-        const profileCodes = JSON.parse(localStorage.getItem('profileCodes')) || {};
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        
-        // Find the username linked to the profile code
-        const foundUsername = Object.keys(profileCodes).find(username => profileCodes[username] === profileCode);
-        let followingList = JSON.parse(localStorage.getItem(`following-${loggedInUser?.username}`)) || [];
+        const foundUser = users.find(user => user.code === profileCode);
 
-        if (!foundUsername) {
-            document.getElementById('profileContainer').innerHTML = '<p>❌ Profile not found.</p>';
+        if (!foundUser) {
+            document.getElementById('profileContainer').innerHTML = '<p>Profile not found!</p>';
         } else {
-            const foundUser = users.find(user => user.username === foundUsername);
-
-            if (foundUser) {
-                document.getElementById('profileContainer').innerHTML = `
-                    <h3>Profile of ${foundUser.username}</h3>
-                    <p><strong>Username:</strong> ${foundUser.username}</p>
-                    <p><strong>Email:</strong> ${foundUser.email}</p>
-                    <p><strong>Profile Code:</strong> ${profileCode}</p>
-                    <button onclick="toggleFollow('${foundUser.username}')">
-                        ${followingList.includes(foundUser.username) ? 'Unfollow' : 'Follow'}
-                    </button>
-                    <button onclick="startChat('${foundUser.username}')">Chat</button>
-                `;
-
-                // Load User Posts
-                const userPosts = JSON.parse(localStorage.getItem(`posts-${foundUser.username}`)) || [];
-                const postsContainer = document.getElementById('userPosts');
-                if (userPosts.length === 0) {
-                    postsContainer.innerHTML = `<p>No posts yet.</p>`;
-                } else {
-                    postsContainer.innerHTML = userPosts.map(post => `
-                        <div class="post-container">
-                            <p>${post}</p>
-                        </div>
-                    `).join('');
-                }
-            } else {
-                document.getElementById('profileContainer').innerHTML = '<p>❌ Profile not found.</p>';
-            }
+            document.getElementById('profileContainer').innerHTML = `
+                <h3>Username: ${foundUser.username}</h3>
+                <p>Email: ${foundUser.email}</p>
+                <button class="follow-btn" onclick="followUser('${foundUser.username}')">Follow</button>
+            `;
         }
 
-        // Toggle Follow/Unfollow
-        function toggleFollow(username) {
-            if (!loggedInUser) {
-                alert('Please log in to follow users.');
-                return;
-            }
-
-            if (followingList.includes(username)) {
-                followingList = followingList.filter(u => u !== username);
-                alert(`Unfollowed ${username}`);
-            } else {
-                followingList.push(username);
-                alert(`Following ${username}`);
-            }
-            localStorage.setItem(`following-${loggedInUser.username}`, JSON.stringify(followingList));
-            window.location.reload();
-        }
-
-        // Start Chat (Dummy action for now)
-        function startChat(username) {
-            alert(`Starting chat with ${username}`);
+        function followUser(username) {
+            alert(`You are now following ${username}`);
         }
     </script>
 </body>
