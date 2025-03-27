@@ -2,280 +2,163 @@
 <html>
 <head>
     <title>CryptoPin Dashboard</title>
-    <meta name="google-adsense-account" content="ca-pub-1204724319985727">
     <style>
         body {
             margin: 0;
             padding: 0;
+            background: #f4f4f4;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
         }
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background: #1f1f1f;
-            color: #fff;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding-top: 20px;
+        .container {
+            width: 80%;
+            margin: 50px auto;
         }
-        .sidebar h2 {
-            text-align: center;
+        h2, h3 {
+            color: #333;
+        }
+        .search-container {
             margin-bottom: 20px;
-            color: #3897f0;
         }
-        .sidebar a {
-            padding: 15px;
-            text-decoration: none;
-            color: #fff;
-            display: block;
-            transition: 0.3s;
-        }
-        .sidebar a:hover {
-            background: #3897f0;
-        }
-        .content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-        .welcome {
-            background: #3897f0;
-            color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        .section {
-            margin-top: 20px;
-            padding: 15px;
-            background: #fff;
+        input[type="text"], button {
+            padding: 10px;
+            margin-top: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+        input[type="text"] {
+            width: 70%;
+        }
         button {
-            padding: 10px 15px;
             background-color: #3897f0;
             color: #fff;
-            border: none;
-            border-radius: 5px;
             cursor: pointer;
         }
         button:hover {
             background-color: #357ae8;
         }
-        input {
-            width: 100%;
+        #profileContainer, #myProfileContainer {
+            margin-top: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .user-profile {
+            margin-top: 20px;
+        }
+        .user-profile p {
+            font-size: 16px;
+        }
+        .post-container {
+            background: #fff;
             padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
             margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>CryptoPin</h2>
-        <a href="#" onclick="showSection('dashboard')">🏠 Dashboard</a>
-        <a href="#" onclick="showSection('myPosts')">📢 My Posts</a>
-        <a href="#" onclick="showSection('createPost')">➕ Create Post</a>
-        <a href="#" onclick="showSection('wallet')">💰 Wallet</a>
-        <a href="#" onclick="showSection('searchProfile')">🔍 Search Profiles</a>
-        <a href="#" onclick="showSection('profile')">👤 Profile</a>
-        <a href="#" onclick="logout()">🚪 Logout</a>
-    </div>
+    <div class="container">
+        <h2>Welcome to CryptoPin Dashboard</h2>
 
-    <!-- Main Content -->
-    <div class="content">
-        <!-- Dashboard -->
-        <div id="dashboard" class="section">
-            <div class="welcome">
-                <h2>Welcome, <span id="username"></span>! 🎉</h2>
-                <p>Explore CryptoPin and engage with crypto content!</p>
-            </div>
+        <!-- Search Container -->
+        <div class="search-container">
+            <input type="text" id="searchUsername" placeholder="Search Username">
+            <button onclick="searchUser()">Search</button>
         </div>
 
-        <!-- My Posts Section -->
-        <div id="myPosts" class="section" style="display:none;">
-            <h3>📢 My Posts</h3>
-            <div id="postList"></div>
-        </div>
+        <!-- My Profile Container -->
+        <div id="myProfileContainer"></div>
 
-        <!-- Create Post Section -->
-        <div id="createPost" class="section" style="display:none;">
-            <h3>➕ Create a New Post</h3>
-            <input type="text" id="postTitle" placeholder="Enter Post Title">
-            <textarea id="postContent" placeholder="Enter Post Content" rows="5"></textarea>
-            <button onclick="createPost()">Post</button>
-        </div>
+        <!-- Search Result - Profile View -->
+        <div id="profileContainer"></div>
 
-        <!-- Wallet Section -->
-        <div id="wallet" class="section" style="display:none;">
-            <h3>💰 Wallet Balance</h3>
-            <p><strong>CryptoPin Tokens:</strong> <span id="walletBalance">0</span> CPT</p>
-            <button onclick="buyTokens()">Buy Tokens</button>
-        </div>
-
-        <!-- Search Profiles Section -->
-        <div id="searchProfile" class="section" style="display:none;">
-            <h3>🔍 Search Profiles</h3>
-            <input type="text" id="searchInput" placeholder="Search by username" onkeyup="searchProfiles()">
-            <div id="searchResults"></div>
-        </div>
-
-        <!-- Profile Section -->
-        <div id="profile" class="section" style="display:none;">
-            <h3>👤 Profile</h3>
-            <p><strong>Username:</strong> <span id="profileUsername"></span></p>
-            <p><strong>Email:</strong> <span id="profileEmail"></span></p>
-            <p><strong>Unique Code:</strong> <span id="uniqueCode"></span></p>
-            <button onclick="logout()">Logout</button>
-        </div>
-
-        <!-- View Profile Section -->
-        <div id="viewProfile" class="section" style="display:none;">
-            <h3>👀 View Profile</h3>
-            <p><strong>Username:</strong> <span id="viewUsername"></span></p>
-            <p><strong>Email:</strong> <span id="viewEmail"></span></p>
-            <p><strong>Unique Code:</strong> <span id="viewUniqueCode"></span></p>
-        </div>
+        <h3>My Posts</h3>
+        <div id="myPosts"></div>
     </div>
 
     <script>
-        // Retrieve logged-in user
-        const user = JSON.parse(localStorage.getItem('loggedInUser'));
-        if (!user) {
-            window.location.href = "index.html"; // Redirect to login if not logged in
+        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        // Check if user is logged in
+        if (!loggedInUser) {
+            window.location.href = 'login.html';
         }
 
-        // Display logged-in user info
-        document.getElementById('username').innerText = user.username;
-        document.getElementById('profileUsername').innerText = user.username;
-        document.getElementById('profileEmail').innerText = user.email;
-        document.getElementById('uniqueCode').innerText = generateUniqueCode(user.username);
+        // Display Logged-in User Profile
+        function loadMyProfile() {
+            const myUniqueCode = localStorage.getItem(`profileCode-${loggedInUser.username}`) || generateUniqueCode();
+            localStorage.setItem(`profileCode-${loggedInUser.username}`, myUniqueCode);
 
-        // Show the selected section
-        function showSection(sectionId) {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.style.display = 'none';
-            });
-            document.getElementById(sectionId).style.display = 'block';
+            document.getElementById('myProfileContainer').innerHTML = `
+                <div class="user-profile">
+                    <h3>My Profile</h3>
+                    <p><strong>Username:</strong> ${loggedInUser.username}</p>
+                    <p><strong>Email:</strong> ${loggedInUser.email}</p>
+                    <p><strong>Unique Code:</strong> ${myUniqueCode}</p>
+                </div>
+            `;
         }
 
-        // Logout function
-        function logout() {
-            localStorage.removeItem('loggedInUser');
-            window.location.href = "index.html";
-        }
+        // Search and View User Profile
+        function searchUser() {
+            const searchUsername = document.getElementById('searchUsername').value.trim();
+            const foundUser = users.find(user => user.username === searchUsername);
 
-        // Generate unique profile code
-        function generateUniqueCode(username) {
-            return `CP-${username}-${Math.floor(100000 + Math.random() * 900000)}`;
-        }
-
-        // Create Post
-        function createPost() {
-            const title = document.getElementById('postTitle').value.trim();
-            const content = document.getElementById('postContent').value.trim();
-
-            if (!title || !content) {
-                alert('⚠️ Title and content cannot be empty!');
+            if (!foundUser) {
+                document.getElementById('profileContainer').innerHTML = `<p>User not found.</p>`;
                 return;
             }
 
-            let posts = JSON.parse(localStorage.getItem('posts')) || [];
-            posts.push({ username: user.username, title, content, date: new Date().toLocaleString() });
-            localStorage.setItem('posts', JSON.stringify(posts));
+            // Get or Generate Unique Code for Profile
+            const uniqueCode = localStorage.getItem(`profileCode-${foundUser.username}`) || generateUniqueCode();
+            localStorage.setItem(`profileCode-${foundUser.username}`, uniqueCode);
 
-            alert('✅ Post created successfully!');
-            showSection('myPosts');
-            loadMyPosts();
+            document.getElementById('profileContainer').innerHTML = `
+                <div class="user-profile">
+                    <h3>Profile of ${foundUser.username}</h3>
+                    <p><strong>Email:</strong> ${foundUser.email}</p>
+                    <p><strong>Unique Code:</strong> ${uniqueCode}</p>
+                    <button onclick="viewUserDashboard('${foundUser.username}')">View Dashboard</button>
+                </div>
+            `;
         }
 
-        // Load My Posts
+        // Redirect to the User's Dashboard
+        function viewUserDashboard(username) {
+            const userToView = users.find(user => user.username === username);
+            if (userToView) {
+                localStorage.setItem('viewUser', JSON.stringify(userToView));
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        // Generate Unique Code (6-digit random number)
+        function generateUniqueCode() {
+            return `CP-${Math.floor(100000 + Math.random() * 900000)}`;
+        }
+
+        // Load My Posts (for current logged-in user)
         function loadMyPosts() {
-            const postList = document.getElementById('postList');
-            postList.innerHTML = '';
-
-            const posts = JSON.parse(localStorage.getItem('posts')) || [];
-            const myPosts = posts.filter(post => post.username === user.username);
-
+            let myPosts = JSON.parse(localStorage.getItem(`posts-${loggedInUser.username}`)) || [];
+            const postsContainer = document.getElementById('myPosts');
             if (myPosts.length === 0) {
-                postList.innerHTML = '<p>No posts yet. Create a new one!</p>';
+                postsContainer.innerHTML = `<p>No posts yet.</p>`;
                 return;
             }
-
-            myPosts.forEach(post => {
-                postList.innerHTML += `
-                    <div style="border: 1px solid #ccc; padding: 10px; margin-top: 10px; border-radius: 5px;">
-                        <h4>${post.title}</h4>
-                        <p>${post.content}</p>
-                        <small>📅 ${post.date}</small>
-                    </div>`;
-            });
+            postsContainer.innerHTML = myPosts.map(post => `
+                <div class="post-container">
+                    <p>${post}</p>
+                </div>
+            `).join('');
         }
 
-        // Buy Tokens and update wallet
-        function buyTokens() {
-            const tokens = prompt('Enter number of tokens to buy:');
-            if (!tokens || isNaN(tokens) || tokens <= 0) {
-                alert('⚠️ Enter a valid token amount!');
-                return;
-            }
-
-            let balance = parseInt(localStorage.getItem(`wallet_${user.username}`)) || 0;
-            balance += parseInt(tokens);
-            localStorage.setItem(`wallet_${user.username}`, balance);
-            alert(`✅ Successfully purchased ${tokens} CPT!`);
-            updateWalletBalance();
-        }
-
-        // Update Wallet Balance
-        function updateWalletBalance() {
-            const balance = parseInt(localStorage.getItem(`wallet_${user.username}`)) || 0;
-            document.getElementById('walletBalance').innerText = balance;
-        }
-
-        // Search Profiles
-        function searchProfiles() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const users = JSON.parse(localStorage.getItem('allUsers')) || [];
-            const results = users.filter(u => u.username.toLowerCase().includes(query));
-
-            const searchResults = document.getElementById('searchResults');
-            searchResults.innerHTML = '';
-
-            if (results.length === 0) {
-                searchResults.innerHTML = '<p>No matching profiles found.</p>';
-                return;
-            }
-
-            results.forEach(profile => {
-                searchResults.innerHTML += `
-                    <div style="padding: 10px; border: 1px solid #ccc; margin-top: 5px;">
-                        <p><strong>${profile.username}</strong></p>
-                        <button onclick="viewProfile('${profile.username}')">View Profile</button>
-                    </div>`;
-            });
-        }
-
-        // View Profile
-        function viewProfile(username) {
-            const users = JSON.parse(localStorage.getItem('allUsers')) || [];
-            const profile = users.find(u => u.username === username);
-
-            if (profile) {
-                document.getElementById('viewUsername').innerText = profile.username;
-                document.getElementById('viewEmail').innerText = profile.email;
-                document.getElementById('viewUniqueCode').innerText = profile.uniqueCode;
-                showSection('viewProfile');
-            }
-        }
-
-        // Load initial data on page load
-        window.onload = function () {
+        window.onload = () => {
+            loadMyProfile();
             loadMyPosts();
-            updateWalletBalance();
         };
     </script>
 </body>
