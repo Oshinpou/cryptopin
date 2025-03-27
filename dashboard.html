@@ -50,6 +50,13 @@
             border: 1px solid #ddd;
             margin-top: 10px;
         }
+        .profile-link {
+            color: #3897f0;
+            text-decoration: none;
+        }
+        .profile-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -59,7 +66,7 @@
 
         <!-- Search Container -->
         <div class="search-container">
-            <input type="text" id="searchUsername" placeholder="Search Username">
+            <input type="text" id="searchUsername" placeholder="Search Username or Profile Code">
             <button onclick="searchUser()">Search</button>
         </div>
 
@@ -73,43 +80,58 @@
     <script>
         let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
         let users = JSON.parse(localStorage.getItem('users')) || [];
+        let profileCodes = JSON.parse(localStorage.getItem('profileCodes')) || {};
 
         // Check if user is logged in
         if (!loggedInUser) {
             window.location.href = 'login.html';
         }
 
-        // Display Logged-in User Profile
+        // Display Logged-in User Profile and Generate Unique Profile Link
         function loadMyProfile() {
-            const myUniqueCode = localStorage.getItem(`profileCode-${loggedInUser.username}`) || generateUniqueCode();
-            localStorage.setItem(`profileCode-${loggedInUser.username}`, myUniqueCode);
+            let myProfileCode = profileCodes[loggedInUser.username];
+            
+            if (!myProfileCode) {
+                myProfileCode = generateUniqueCode();
+                profileCodes[loggedInUser.username] = myProfileCode;
+                localStorage.setItem('profileCodes', JSON.stringify(profileCodes));
+            }
 
+            const profileLink = `${window.location.origin}/profile.html?code=${myProfileCode}`;
+            
             document.getElementById('myProfileContainer').innerHTML = `
                 <div class="user-profile">
                     <h3>My Profile</h3>
                     <p><strong>Username:</strong> ${loggedInUser.username}</p>
                     <p><strong>Email:</strong> ${loggedInUser.email}</p>
-                    <p><strong>Unique Code:</strong> ${myUniqueCode}</p>
+                    <p><strong>Profile Link:</strong> <a class="profile-link" href="${profileLink}" target="_blank">${profileLink}</a></p>
                 </div>
             `;
         }
 
         // Search and Redirect to Profile Page
         function searchUser() {
-            const searchUsername = document.getElementById('searchUsername').value.trim();
-            const foundUser = users.find(user => user.username === searchUsername);
+            const searchValue = document.getElementById('searchUsername').value.trim();
 
-            if (!foundUser) {
-                alert('User not found.');
-                return;
+            // Search by username
+            const foundUser = users.find(user => user.username === searchValue);
+
+            // Search by profile code
+            const foundUsernameByCode = Object.keys(profileCodes).find(key => profileCodes[key] === searchValue);
+
+            if (foundUser) {
+                // If found by username
+                const profileCode = profileCodes[foundUser.username];
+                window.location.href = `profile.html?code=${profileCode}`;
+            } else if (foundUsernameByCode) {
+                // If found by profile code
+                window.location.href = `profile.html?code=${searchValue}`;
+            } else {
+                alert('❌ User not found.');
             }
-
-            // Store user data in localStorage to pass to profile page
-            localStorage.setItem('viewUser', JSON.stringify(foundUser));
-            window.location.href = `profile.html?username=${searchUsername}`;
         }
 
-        // Generate Unique Code (6-digit random number)
+        // Generate Unique 6-Digit Profile Code
         function generateUniqueCode() {
             return `CP-${Math.floor(100000 + Math.random() * 900000)}`;
         }
