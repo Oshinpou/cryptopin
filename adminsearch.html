@@ -42,17 +42,11 @@
         // Load all registered users
         const users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // Generate profile links for all users
-        function generateProfileLink(username) {
-            return `profile.html?user=${encodeURIComponent(username)}`;
-        }
-
         // Display all profile links for admin
         const userLinksDiv = document.getElementById('userLinks');
         if (users.length > 0) {
             users.forEach(user => {
-                const link = generateProfileLink(user.username);
-                userLinksDiv.innerHTML += `<p><a href="${link}" target="_blank">${user.username}'s Profile</a></p>`;
+                userLinksDiv.innerHTML += `<p><a href="${user.uniqueLink}" target="_blank">${user.username}'s Profile</a></p>`;
             });
         } else {
             userLinksDiv.innerHTML = '<p>No users found.</p>';
