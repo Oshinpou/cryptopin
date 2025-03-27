@@ -85,19 +85,25 @@
         }
 
         function loadUsers() {
-            const userList = document.getElementById('userList');
-            if (users.length === 0) {
-                userList.innerHTML = '<p>No users found.</p>';
-                return;
-            }
-            userList.innerHTML = users.map((user, index) => `
-                <div class="user-item">
-                    <p><strong>${user.username}</strong> (${user.email})</p>
-                    <p>Profile Link: <a href="profile.html?code=${user.code}" target="_blank">View Profile</a></p>
-                    <button class="delete-btn" onclick="deleteUser(${index})">Delete</button>
-                </div>
-            `).join('');
-        }
+    const userList = document.getElementById('userList');
+    let storedProfiles = JSON.parse(localStorage.getItem('userProfiles')) || {};
+
+    if (users.length === 0) {
+        userList.innerHTML = '<p>No users found.</p>';
+        return;
+    }
+
+    userList.innerHTML = users.map((user, index) => {
+        const profileLink = storedProfiles[user.username] || `profile.html?code=${user.code}`;
+        return `
+            <div class="user-item">
+                <p><strong>${user.username}</strong> (${user.email})</p>
+                <p>Profile Link: <a href="${profileLink}" target="_blank">View Profile</a></p>
+                <button class="delete-btn" onclick="deleteUser(${index})">Delete</button>
+            </div>
+        `;
+    }).join('');
+}
 
         function deleteUser(index) {
             users.splice(index, 1);
