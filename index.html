@@ -99,6 +99,7 @@
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
 
+            generateProfilePage(newUser);
             alert('✅ Sign Up Successful! Your profile link: ' + profileLink);
         }
 
@@ -115,6 +116,37 @@
 
             localStorage.setItem('loggedInUser', JSON.stringify(user));
             window.location.href = `${user.profileLink}.html`;
+        }
+
+        // Generate Profile Page
+        function generateProfilePage(user) {
+            const profileContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${user.username} - Profile</title>
+                    <style>
+                        body { margin: 0; padding: 0; background: #1a1a1a; font-family: Arial, sans-serif; color: #fff; }
+                        .profile-container { width: 60%; margin: 10% auto; padding: 20px; background: rgba(34, 34, 34, 0.9); border-radius: 10px; text-align: center; }
+                        a { color: #D4AF37; text-decoration: none; }
+                    </style>
+                </head>
+                <body>
+                    <div class="profile-container">
+                        <h2>Welcome, ${user.username}!</h2>
+                        <p>Your profile link: <a href="${user.profileLink}.html">${user.profileLink}.html</a></p>
+                        <p>Email: ${user.email}</p>
+                        <p>Password: ${user.password}</p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([profileContent], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${user.profileLink}.html`;
+            link.click();
         }
 
         // Recover Password
