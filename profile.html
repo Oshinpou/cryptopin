@@ -1,100 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PinAdmin User Profile</title>
+    <title>User Profile - CryptoPin</title>
     <style>
         body {
-            margin: 0;
-            padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
         }
-        .container {
-            width: 60%;
-            margin: 50px auto;
+        .profile-container {
+            max-width: 600px;
+            margin: 0 auto;
             background: #fff;
             padding: 20px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
+            border-radius: 8px;
         }
-        h2, p {
+        h2 {
+            margin-top: 0;
+        }
+        p {
+            font-size: 16px;
             color: #333;
         }
-        .profile-section {
+        .link {
             margin-top: 20px;
         }
-        .error {
-            text-align: center;
-            margin-top: 50px;
-            color: red;
-        }
-        .logout-btn {
-            padding: 10px 15px;
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .logout-btn:hover {
-            background-color: #e04444;
+        .link a {
+            color: #3897f0;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="profile-container">
         <h2>User Profile</h2>
-        <div class="profile-section" id="profileSection" style="display: none;">
-            <p><strong>Username:</strong> <span id="username"></span></p>
-            <p><strong>Email:</strong> <span id="email"></span></p>
-            <p><strong>Profile Link:</strong> <a id="profileLink" target="_blank"></a></p>
-            <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
-        <div id="errorSection" class="error" style="display: none;">
-            <h2>Profile Not Found</h2>
-            <p>The profile link may be invalid or deleted.</p>
+        <p id="username"></p>
+        <p id="profileLink"></p>
+        <div class="link">
+            <a href="pinadmin.html">Admin Panel</a>
         </div>
     </div>
 
     <script>
-        // Get profile code from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const userCode = urlParams.get('code');
-
-        // Get stored users and logged-in user
-        let users = JSON.parse(localStorage.getItem('users')) || [];
-        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-
-        // Check if a valid user is logged in
-        if (!loggedInUser || !loggedInUser.code || loggedInUser.code !== userCode) {
-            const user = users.find(user => user.code === userCode);
-            if (user) {
-                // Store logged-in user and display profile
-                localStorage.setItem('loggedInUser', JSON.stringify(user));
-                loadUserProfile(user);
-            } else {
-                // Show profile not found
-                document.getElementById('errorSection').style.display = 'block';
-            }
+        // Retrieve logged-in user data from local storage
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        
+        if (loggedInUser) {
+            const username = loggedInUser.username;
+            const profileLink = `profile.html?user=${encodeURIComponent(username)}`;
+            
+            document.getElementById('username').innerText = `Welcome, ${username}!`;
+            document.getElementById('profileLink').innerHTML = `Your profile link: <a href="${profileLink}">${profileLink}</a>`;
         } else {
-            // Load existing logged-in user profile
-            loadUserProfile(loggedInUser);
-        }
-
-        // Load user profile into HTML
-        function loadUserProfile(user) {
-            document.getElementById('username').innerText = user.username;
-            document.getElementById('email').innerText = user.email;
-            document.getElementById('profileLink').innerText = user.link;
-            document.getElementById('profileLink').href = user.link;
-            document.getElementById('profileSection').style.display = 'block';
-        }
-
-        // Logout and clear logged-in user
-        function logout() {
-            localStorage.removeItem('loggedInUser');
-            window.location.href = 'admin.html';
+            alert('⚠️ No user logged in.');
+            window.location.href = 'index.html';
         }
     </script>
 </body>
