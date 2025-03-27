@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CryptoPin Admin Panel</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        input, button {
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #3897f0;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+        .user-list {
+            margin-top: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .user-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .delete-btn {
+            background: red;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>CryptoPin Admin Panel</h2>
+
+        <h3>Add New User</h3>
+        <input type="text" id="username" placeholder="Username">
+        <input type="text" id="email" placeholder="Email">
+        <button onclick="addUser()">Add User</button>
+
+        <h3>All User Accounts</h3>
+        <div id="userList" class="user-list"></div>
+    </div>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        function addUser() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            if (!username || !email) {
+                alert('Please enter valid username and email.');
+                return;
+            }
+
+            const uniqueCode = generateUniqueCode();
+            const newUser = { username, email, code: uniqueCode };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsers();
+            alert('User added successfully!');
+        }
+
+        function generateUniqueCode() {
+            return `CP-${Math.floor(100000 + Math.random() * 900000)}`;
+        }
+
+        function loadUsers() {
+            const userList = document.getElementById('userList');
+            if (users.length === 0) {
+                userList.innerHTML = '<p>No users found.</p>';
+                return;
+            }
+            userList.innerHTML = users.map((user, index) => `
+                <div class="user-item">
+                    <p><strong>${user.username}</strong> (${user.email})</p>
+                    <p>Profile Link: <a href="profile.html?code=${user.code}" target="_blank">View Profile</a></p>
+                    <button class="delete-btn" onclick="deleteUser(${index})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteUser(index) {
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsers();
+        }
+
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>
