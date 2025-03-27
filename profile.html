@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CryptoPin Dashboard</title>
+    <title>User Profile</title>
     <style>
         body {
             margin: 0;
@@ -13,100 +13,55 @@
             width: 80%;
             margin: 50px auto;
         }
-        h2, h3 {
+        h2, p {
             color: #333;
         }
-        .search-container {
-            margin-bottom: 20px;
-        }
-        input[type="text"], button {
-            padding: 10px;
-            margin-top: 10px;
-            border: 1px solid #ccc;
+        .profile-container {
+            background: #fff;
+            padding: 20px;
             border-radius: 5px;
-        }
-        input[type="text"] {
-            width: 70%;
+            border: 1px solid #ddd;
         }
         button {
+            padding: 10px 20px;
             background-color: #3897f0;
             color: #fff;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
+            margin-top: 20px;
         }
         button:hover {
             background-color: #357ae8;
-        }
-        #myProfileContainer {
-            margin-top: 20px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .post-container {
-            background: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Welcome to CryptoPin Dashboard</h2>
-
-        <!-- Search Container -->
-        <div class="search-container">
-            <input type="text" id="searchUsername" placeholder="Search Username">
-            <button onclick="searchUser()">Search</button>
-        </div>
-
-        <!-- My Profile Container -->
-        <div id="myProfileContainer"></div>
-
-        <h3>My Posts</h3>
-        <div id="myPosts"></div>
+        <h2>User Profile</h2>
+        <div id="profileContainer" class="profile-container"></div>
+        <button onclick="goBack()">Back to Dashboard</button>
     </div>
 
     <script>
-        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        let users = JSON.parse(localStorage.getItem('users')) || [];
+        // Get query parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+        
+        let viewUser = JSON.parse(localStorage.getItem('viewUser'));
+        
+        if (!viewUser || viewUser.username !== username) {
+            document.getElementById('profileContainer').innerHTML = `<p>User not found.</p>`;
+        } else {
+            const uniqueCode = localStorage.getItem(`profileCode-${viewUser.username}`) || generateUniqueCode();
+            localStorage.setItem(`profileCode-${viewUser.username}`, uniqueCode);
 
-        // Check if user is logged in
-        if (!loggedInUser) {
-            window.location.href = 'login.html';
-        }
-
-        // Display Logged-in User Profile
-        function loadMyProfile() {
-            const myUniqueCode = localStorage.getItem(`profileCode-${loggedInUser.username}`) || generateUniqueCode();
-            localStorage.setItem(`profileCode-${loggedInUser.username}`, myUniqueCode);
-
-            document.getElementById('myProfileContainer').innerHTML = `
-                <div class="user-profile">
-                    <h3>My Profile</h3>
-                    <p><strong>Username:</strong> ${loggedInUser.username}</p>
-                    <p><strong>Email:</strong> ${loggedInUser.email}</p>
-                    <p><strong>Unique Code:</strong> ${myUniqueCode}</p>
-                </div>
+            document.getElementById('profileContainer').innerHTML = `
+                <p><strong>Username:</strong> ${viewUser.username}</p>
+                <p><strong>Email:</strong> ${viewUser.email}</p>
+                <p><strong>Unique Code:</strong> ${uniqueCode}</p>
             `;
-        }
-
-        // Search and Redirect to Profile Page
-        function searchUser() {
-            const searchUsername = document.getElementById('searchUsername').value.trim();
-            const foundUser = users.find(user => user.username === searchUsername);
-
-            if (!foundUser) {
-                alert('User not found.');
-                return;
-            }
-
-            // Store user data in localStorage to pass to profile page
-            localStorage.setItem('viewUser', JSON.stringify(foundUser));
-            window.location.href = `profile.html?username=${searchUsername}`;
         }
 
         // Generate Unique Code (6-digit random number)
@@ -114,25 +69,10 @@
             return `CP-${Math.floor(100000 + Math.random() * 900000)}`;
         }
 
-        // Load My Posts (for current logged-in user)
-        function loadMyPosts() {
-            let myPosts = JSON.parse(localStorage.getItem(`posts-${loggedInUser.username}`)) || [];
-            const postsContainer = document.getElementById('myPosts');
-            if (myPosts.length === 0) {
-                postsContainer.innerHTML = `<p>No posts yet.</p>`;
-                return;
-            }
-            postsContainer.innerHTML = myPosts.map(post => `
-                <div class="post-container">
-                    <p>${post}</p>
-                </div>
-            `).join('');
+        // Go Back to Dashboard
+        function goBack() {
+            window.location.href = 'dashboard.html';
         }
-
-        window.onload = () => {
-            loadMyProfile();
-            loadMyPosts();
-        };
     </script>
 </body>
 </html>
