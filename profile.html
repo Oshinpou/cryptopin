@@ -1,57 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CryptoPin - Profile</title>
-    <link rel="stylesheet" type="text/css" href="profile.css">
+    <title>User Profile</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+        }
+        h2, p {
+            color: #333;
+        }
+        .profile-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3897f0;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header Section -->
-    <div class="header">
-        <img src="icon.webp" alt="CryptoPin" class="logo">
-        <button class="burger-menu" onclick="toggleMenu()">☰</button>
+
+    <div class="container">
+        <h2>User Profile</h2>
+        <div id="profileContainer" class="profile-container"></div>
+        <button onclick="goBack()">Back to Dashboard</button>
     </div>
 
-    <!-- Burger Menu -->
-    <div id="menu" class="menu">
-        <a onclick="openSearch()">Search Username</a>
-        <a onclick="openCommunity()">Community</a>
-        <a onclick="promotePost()">Promote Posts</a>
-        <a onclick="logout()">Logout</a>
-    </div>
+    <script>
+        // Get query parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+        
+        let viewUser = JSON.parse(localStorage.getItem('viewUser'));
+        
+        if (!viewUser || viewUser.username !== username) {
+            document.getElementById('profileContainer').innerHTML = `<p>User not found.</p>`;
+        } else {
+            const uniqueCode = localStorage.getItem(`profileCode-${viewUser.username}`) || generateUniqueCode();
+            localStorage.setItem(`profileCode-${viewUser.username}`, uniqueCode);
 
-    <!-- Profile Section -->
-    <div class="profile-container">
-        <div class="profile-header">
-            <img id="profilePic" src="media/placeholder.png" alt="Profile Picture">
-            <input type="file" id="uploadProfilePic" accept="image/*" onchange="uploadProfilePic(event)">
-            <h2 id="username"></h2>
-            <p id="country"></p>
-            <p id="category"></p>
-        </div>
+            document.getElementById('profileContainer').innerHTML = `
+                <p><strong>Username:</strong> ${viewUser.username}</p>
+                <p><strong>Email:</strong> ${viewUser.email}</p>
+                <p><strong>Unique Code:</strong> ${uniqueCode}</p>
+            `;
+        }
 
-        <div class="profile-info">
-            <p><strong>Bio:</strong> <span id="bio"></span></p>
-            <textarea id="editBio" placeholder="Update your bio..."></textarea>
-            <button onclick="updateBio()">Update Bio</button>
-            <div class="stats">
-                <p><strong>Followers:</strong> <span id="followers">0</span></p>
-                <p><strong>Following:</strong> <span id="following">0</span></p>
-                <p><strong>Total Posts:</strong> <span id="totalPosts">0</span></p>
-            </div>
-        </div>
+        // Generate Unique Code (6-digit random number)
+        function generateUniqueCode() {
+            return `CP-${Math.floor(100000 + Math.random() * 900000)}`;
+        }
 
-        <!-- Post Upload Section -->
-        <div class="post-upload">
-            <textarea id="postText" placeholder="Write something..."></textarea>
-            <input type="file" id="mediaUpload" accept="image/*, video/*" onchange="uploadMedia(event)">
-            <button onclick="createPost()">Upload Post</button>
-        </div>
-
-        <!-- Post Display Section -->
-        <div id="postContainer"></div>
-    </div>
-
-    <script src="profile.js"></script>
-    <script src="post.js"></script>
+        // Go Back to Dashboard
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
 </body>
 </html>
