@@ -37,21 +37,12 @@
             color: #ff4d4d;
             margin-top: 10px;
         }
-        #profileInfo {
-            margin-top: 20px;
-            color: #D4AF37;
-        }
     </style>
 </head>
 <body>
 
-    <div class="form-container">
+    <div class="form-container" id="form-container">
         <h2>Crypto Pin - Social Hub</h2>
-
-        <div id="profileInfo" style="display: none;">
-            <h3>Welcome, <span id="loggedInUser"></span>!</h3>
-            <button onclick="logout()">Logout</button>
-        </div>
 
         <!-- Sign Up Form -->
         <form id="signupForm">
@@ -70,46 +61,24 @@
             <button type="button" onclick="login()">Login</button>
         </form>
 
-        <!-- Recover Password Form -->
-        <form id="recoverForm">
-            <h3>Recover Password</h3>
-            <input type="text" id="recoverUsername" placeholder="Enter Username" required>
-            <input type="email" id="recoverEmail" placeholder="Enter Email" required>
-            <button type="button" onclick="recoverPassword()">Recover</button>
-        </form>
-
-        <!-- Delete Account Form -->
-        <form id="deleteForm">
-            <h3>Delete Account</h3>
-            <input type="text" id="deleteUsername" placeholder="Enter Username" required>
-            <input type="email" id="deleteEmail" placeholder="Enter Email" required>
-            <input type="password" id="deletePassword" placeholder="Enter Password" required>
-            <button type="button" onclick="deleteAccount()">Delete</button>
-        </form>
-
         <div id="error" class="error-msg"></div>
+
+        <h4>Forgot Password?</h4>
+        <input type="text" id="recoverUsername" placeholder="Enter Username">
+        <input type="email" id="recoverEmail" placeholder="Enter Email">
+        <button type="button" onclick="recoverPassword()">Recover Password</button>
+
+        <h4>Delete Account</h4>
+        <input type="text" id="deleteUsername" placeholder="Enter Username">
+        <input type="email" id="deleteEmail" placeholder="Enter Email">
+        <input type="password" id="deletePassword" placeholder="Enter Password">
+        <button type="button" onclick="deleteAccount()">Delete Account</button>
     </div>
 
     <script>
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // Check if a user is already logged in
-        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        if (loggedInUser) {
-            showLoggedInUI(loggedInUser.username);
-        }
-
-        // Show logged-in UI
-        function showLoggedInUI(username) {
-            document.getElementById('profileInfo').style.display = 'block';
-            document.getElementById('loggedInUser').innerText = username;
-            document.getElementById('signupForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('recoverForm').style.display = 'none';
-            document.getElementById('deleteForm').style.display = 'none';
-        }
-
-        // Sign Up
+        // Sign Up Function
         function signUp() {
             const username = document.getElementById('signupUsername').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
@@ -125,7 +94,7 @@
                 return;
             }
 
-            const profileLink = `profile-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+            const profileLink = `profile-${username}-${Date.now()}`;
             const newUser = { username, email, password, profileLink };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
@@ -133,7 +102,7 @@
             alert('✅ Sign Up Successful! Your profile link: ' + profileLink);
         }
 
-        // Login
+        // Login Function
         function login() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
@@ -145,29 +114,20 @@
             }
 
             localStorage.setItem('loggedInUser', JSON.stringify(user));
-            alert('✅ Login Successful! Redirecting to your profile...');
             window.location.href = `${user.profileLink}.html`;
-        }
-
-        // Logout
-        function logout() {
-            localStorage.removeItem('loggedInUser');
-            alert('✅ Logged out successfully.');
-            window.location.href = 'signup-login.html';
         }
 
         // Recover Password
         function recoverPassword() {
             const username = document.getElementById('recoverUsername').value.trim();
             const email = document.getElementById('recoverEmail').value.trim();
-
             const user = users.find(u => u.username === username && u.email === email);
-            if (!user) {
-                alert('❌ No account found with these details.');
-                return;
-            }
 
-            alert('🔐 Your password is: ' + user.password);
+            if (user) {
+                alert(`✅ Password recovered successfully!\nYour password is: ${user.password}`);
+            } else {
+                alert('❌ User not found with provided details.');
+            }
         }
 
         // Delete Account
@@ -176,16 +136,14 @@
             const email = document.getElementById('deleteEmail').value.trim();
             const password = document.getElementById('deletePassword').value.trim();
 
-            const index = users.findIndex(u => u.username === username && u.email === email && u.password === password);
-            if (index === -1) {
-                alert('❌ Invalid details. No account found.');
-                return;
+            const userIndex = users.findIndex(u => u.username === username && u.email === email && u.password === password);
+            if (userIndex !== -1) {
+                users.splice(userIndex, 1);
+                localStorage.setItem('users', JSON.stringify(users));
+                alert('🗑️ Account deleted successfully.');
+            } else {
+                alert('❌ Account not found or incorrect details.');
             }
-
-            users.splice(index, 1);
-            localStorage.setItem('users', JSON.stringify(users));
-            alert('🗑️ Account deleted successfully.');
-            logout();
         }
     </script>
 </body>
