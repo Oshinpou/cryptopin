@@ -53,6 +53,7 @@
         .profile-link {
             color: #3897f0;
             text-decoration: none;
+            cursor: pointer;
         }
         .profile-link:hover {
             text-decoration: underline;
@@ -102,7 +103,7 @@
             document.getElementById('myProfileContainer').innerHTML = `
                 <div class="user-profile">
                     <h3>My Profile</h3>
-                    <p><strong>Username:</strong> ${loggedInUser.username}</p>
+                    <p><strong>Username:</strong> <a class="profile-link" href="profile.html?code=${myProfileCode}" target="_blank">${loggedInUser.username}</a></p>
                     <p><strong>Email:</strong> ${loggedInUser.email}</p>
                     <p><strong>Profile Link:</strong> <a class="profile-link" href="${profileLink}" target="_blank">${profileLink}</a></p>
                 </div>
