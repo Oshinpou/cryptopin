@@ -157,9 +157,8 @@ function login() {
     }
 
     // Store logged-in user and redirect
-    localStorage.setItem('loggedInUser', JSON.stringify(user));
-    window.location.href = user.uniqueLink;
-}
+localStorage.setItem('loggedInUser', JSON.stringify(user));
+window.location.href = 'dashboard.html';
         
         // Forgot Password Request
         function forgotPassword() {
