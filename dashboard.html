@@ -1,22 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>CryptoPin Dashboard</title>
+    <title>Admin Search - CryptoPin</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .container {
-            width: 80%;
-            margin: 50px auto;
+            width: 400px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
         }
-        h2, h3 {
-            color: #333;
+        h2 {
+            margin-bottom: 20px;
         }
         input, button {
+            width: 100%;
             padding: 10px;
             margin-top: 10px;
             border: 1px solid #ccc;
@@ -30,32 +39,47 @@
         button:hover {
             background-color: #357ae8;
         }
+        .error {
+            color: #ff4d4d;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Welcome to CryptoPin Dashboard</h2>
-
+        <h2>Search User Profile</h2>
+        
         <!-- Search Bar -->
-        <input type="text" id="searchInput" placeholder="Enter Username or Profile Code">
+        <input type="text" id="searchInput" placeholder="Enter Username">
         <button onclick="searchProfile()">Search</button>
 
+        <div id="error" class="error"></div>
     </div>
 
     <script>
-        let users = JSON.parse(localStorage.getItem('users')) || [];
+        // Load Admin Data
+        const adminData = JSON.parse(localStorage.getItem('adminData')) || [];
 
+        // Search for Profile by Username
         function searchProfile() {
             const searchValue = document.getElementById('searchInput').value.trim();
-            const foundUser = users.find(user => user.username === searchValue || user.code === searchValue);
-
-            if (!foundUser) {
-                alert('Profile not found!');
+            
+            if (!searchValue) {
+                document.getElementById('error').innerText = "⚠️ Please enter a username.";
                 return;
             }
 
-            window.location.href = `profile.html?code=${foundUser.code}`;
+            // Find User in Admin Data
+            const foundUser = adminData.find(user => user.username === searchValue);
+
+            if (!foundUser) {
+                document.getElementById('error').innerText = "❌ Profile not found!";
+                return;
+            }
+
+            // Redirect to the user's unique profile link
+            window.location.href = foundUser.uniqueLink;
         }
     </script>
 </body>
