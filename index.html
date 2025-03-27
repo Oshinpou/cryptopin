@@ -1,66 +1,227 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Pin - Home</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Sign Up & Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+        .profile-section {
+            display: none;
+            margin-top: 20px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
 </head>
-
 <body>
-    <div class="container">
-        <!-- Logo with Link to Home -->
-        <div class="logo-container">
-            <a href="index.html"><img src="icon.webp" alt="Crypto Pin Logo" class="logo"></a>
-        </div>
 
-        <!-- Navigation Bar -->
-        <nav class="navbar">
-            <div class="burger-menu" id="burger-menu">&#9776;</div>
-            <ul class="nav-links" id="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="community.html">Community</a></li>
-                <li><a href="admin.html">Admin Panel</a></li>
-                <li><a href="profile.html">Your Profile</a></li>
-                <li><a href="notifications.html">Notifications</a></li>
-                <li><a href="about.html">About Us</a></li>
-            </ul>
-        </nav>
+<div class="container" id="signupContainer">
+    <!-- Sign Up Form -->
+    <h2>Sign Up</h2>
+    <input type="text" id="signupUsername" placeholder="Username" required>
+    <input type="email" id="signupEmail" placeholder="Email" required>
+    <input type="password" id="signupPassword" placeholder="Password" required>
+    <button onclick="signUp()">Sign Up</button>
+    <div class="link">Already have an account? <a href="#" onclick="showLogin()">Login here</a></div>
+    <p class="error" id="signupError"></p>
+</div>
 
-        <!-- Login/Signup Button & Logout -->
-        <div id="auth-container">
-            <a href="signup-login.html" class="btn-auth" id="auth-btn">Login / Sign Up</a>
-            <button id="logout-btn" class="btn-auth hidden">Logout (<span id="username-display"></span>)</button>
-        </div>
+<div class="container" id="loginContainer" style="display:none;">
+    <!-- Login Form -->
+    <h2>Login</h2>
+    <input type="text" id="loginUsername" placeholder="Username or Email" required>
+    <input type="password" id="loginPassword" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <div class="link">Don't have an account? <a href="#" onclick="showSignUp()">Sign up here</a></div>
+    <p class="error" id="loginError"></p>
+</div>
 
-        <!-- Main Content -->
-        <div class="content">
-            <h1>Welcome to Crypto Pin</h1>
-            <p class="tagline">Share, Pin, and Explore the Best Crypto Content!</p>
-
-            <!-- Featured Posts Section -->
-            <div id="post-container">
-                <h2>Featured Posts</h2>
-                <div id="post-feed" class="post-feed">
-                    <!-- Posts dynamically loaded here -->
-                </div>
-                <button id="load-more" class="btn-load">Load More Posts</button>
-            </div>
-        </div>
-
-        <!-- Footer Links -->
-        <footer>
-            <ul>
-                <li><a href="profile_manager.html">Contact Us</a></li>
-                <li><a href="faq.html">FAQ</a></li>
-                <li><a href="privacy.html">Privacy Policy</a></li>
-                <li><a href="terms.html">Terms & Conditions</a></li>
-            </ul>
-        </footer>
+<!-- Virtual Profile Section -->
+<div class="container profile-section" id="profileContainer">
+    <h2>Welcome, <span id="profileUsername"></span>!</h2>
+    <h3>Your Profile</h3>
+    <textarea id="profileData" placeholder="Update your profile data..."></textarea>
+    <button onclick="updateProfile()">Save Data</button>
+    <div>
+        <h3>Stored Data:</h3>
+        <p id="storedProfileData">No data stored yet.</p>
     </div>
+    <button onclick="logout()">Logout</button>
+</div>
 
-    <script src="script.js"></script>
+<script>
+    // User Data Storage
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    let adminData = JSON.parse(localStorage.getItem('adminData')) || [];
+
+    // Show Login Form
+    function showLogin() {
+        document.getElementById('signupContainer').style.display = 'none';
+        document.getElementById('loginContainer').style.display = 'block';
+    }
+
+    // Show Sign Up Form
+    function showSignUp() {
+        document.getElementById('signupContainer').style.display = 'block';
+        document.getElementById('loginContainer').style.display = 'none';
+    }
+
+    // Generate Virtual Profile Link
+    function generateUniqueLink(username) {
+        return `index.html?user=${username}`;
+    }
+
+    // Store User in Admin
+    function storeUserForAdmin(username, uniqueLink) {
+        adminData.push({ username, uniqueLink });
+        localStorage.setItem('adminData', JSON.stringify(adminData));
+    }
+
+    // Sign Up Function
+    function signUp() {
+        const username = document.getElementById('signupUsername').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value.trim();
+        
+        if (!username || !email || !password) {
+            document.getElementById('signupError').innerText = '⚠️ All fields are required!';
+            return;
+        }
+
+        if (users.find(user => user.username === username || user.email === email)) {
+            document.getElementById('signupError').innerText = '⚠️ Username or Email already exists.';
+            return;
+        }
+
+        const uniqueLink = generateUniqueLink(username);
+        users.push({ username, email, password, uniqueLink });
+        localStorage.setItem('users', JSON.stringify(users));
+        storeUserForAdmin(username, uniqueLink);
+
+        alert(`✅ Sign Up Successful! Profile Link: ${uniqueLink}`);
+        showLogin();
+    }
+
+    // Login Function
+    function login() {
+        const loginInput = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        
+        const user = users.find(user => (user.username === loginInput || user.email === loginInput) && user.password === password);
+
+        if (!user) {
+            document.getElementById('loginError').innerText = '❌ Invalid Username or Password.';
+            return;
+        }
+
+        // Redirect to virtual profile using query
+        window.location.href = `index.html?user=${user.username}`;
+    }
+
+    // Check URL for Virtual Profile Access
+    function loadProfileData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('user');
+
+        if (username) {
+            const user = users.find(u => u.username === username);
+            if (user) {
+                document.getElementById('signupContainer').style.display = 'none';
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('profileContainer').style.display = 'block';
+                document.getElementById('profileUsername').innerText = username;
+
+                let profileData = localStorage.getItem(`profile_${username}`);
+                if (profileData) {
+                    document.getElementById('storedProfileData').innerText = profileData;
+                }
+            }
+        }
+    }
+
+    // Update Profile Data
+    function updateProfile() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('user');
+        const data = document.getElementById('profileData').value.trim();
+
+        if (data) {
+            localStorage.setItem(`profile_${username}`, data);
+            document.getElementById('storedProfileData').innerText = data;
+            alert('✅ Profile Data Updated Successfully!');
+        } else {
+            alert('⚠️ Please enter data to update.');
+        }
+    }
+
+    // Logout Function
+    function logout() {
+        window.location.href = 'index.html';
+    }
+
+    // Load Profile on Page Load
+    window.onload = function () {
+        loadProfileData();
+    };
+</script>
+
 </body>
-
 </html>
