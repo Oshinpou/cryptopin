@@ -1,436 +1,240 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard - CryptoPin Social</title>
-    <meta name="google-adsense-account" content="ca-pub-1204724319985727">
+    <title>CryptoPin - Dashboard</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
             margin: 0;
             padding: 0;
-            background-color: #fafafa;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
-        .container {
-            width: 100%;
-            max-width: 800px;
-            margin: 20px;
+        #dashboard {
+            width: 90%;
+            max-width: 700px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #profileSection {
             text-align: center;
+            margin-bottom: 20px;
         }
-        .username {
-            font-size: 20px;
-            font-weight: bold;
-            color: #262626;
+        #profileImg {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
             margin-bottom: 10px;
         }
-        #profilePicture {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 3px solid #ccc;
-            object-fit: cover;
-            margin-top: 10px;
+        #username {
+            font-size: 22px;
+            font-weight: bold;
         }
-        .profile-btn, .follow-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
+        .btn {
             padding: 10px 20px;
             margin-top: 10px;
-            border-radius: 5px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
             cursor: pointer;
         }
-        .profile-btn:hover, .follow-btn:hover {
-            background-color: #45a049;
+        .btn:hover {
+            background-color: #218838;
         }
-        .hidden-for-visitors {
-            display: none;
-        }
-        #bioSection, #profileSection {
-            margin-top: 20px;
-        }
-        #bioText {
+        #bioSection textarea {
             width: 100%;
-            max-width: 600px;
-            height: 200px;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-            resize: none;
-        }
-        #bioDisplay {
             margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
+        }
+        #followersSection, #followingSection {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .profile-item {
             background-color: #f9f9f9;
-            width: 100%;
-            max-width: 600px;
-            text-align: left;
-            white-space: pre-line;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
         }
-        #logoutBtn {
-            background-color: #ff4d4d;
-            margin-top: 20px;
-        }
-        #logoutBtn:hover {
-            background-color: #e04343;
-        }
-        #followSection, #followerSection, #followingSection {
-            margin-top: 20px;
-            text-align: left;
-        }
-        .section-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 20px;
-            text-align: left;
-        }
-        .profile-list {
+        #searchSection input {
+            width: 70%;
+            padding: 10px;
             margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            background-color: #f9f9f9;
-            border-radius: 5px;
         }
-   
-    #searchSection {
-    text-align: center;
-    margin-top: 50px;
-}
-
-#searchInput {
-    width: 300px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-#searchBtn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-left: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-#searchBtn:hover {
-    background-color: #45a049;
-}
-
-#searchResults {
-    margin-top: 20px;
-    padding: 10px;
-    width: 100%;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
+        #searchSection button {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        #searchSection button:hover {
+            background-color: #0056b3;
+        }
+        #shareSection {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Search Bar Section -->
-    <div id="searchSection">
-        <input type="text" id="searchInput" placeholder="Search by username..." />
-        <button id="searchBtn" onclick="searchUser()">Search</button>
-        <div id="searchResults"></div>
-    </div>
- 
-    <div class="container">
-        <!-- Display Logged-In Username -->
-        <div class="username" id="loggedInUsername">Welcome, User</div>
-
+    <div id="dashboard">
         <!-- Profile Section -->
         <div id="profileSection">
-            <img id="profilePicture" src="default-profile.jpg" alt="Profile Picture">
-            <input type="file" id="uploadProfileBtn" class="profile-btn hidden-for-visitors" accept="image/*" onchange="uploadProfile()">
-        </div>
-
-        <!-- Follow Button for Visitors -->
-        <button id="followBtn" class="follow-btn" onclick="toggleFollow()">Follow</button>
-
-        <!-- Following & Followers Count -->
-        <div id="followSection">
-            <div class="section-title">Following: <span id="followingCount">0</span> | Followers: <span id="followerCount">0</span></div>
+            <img id="profileImg" src="default.jpg" alt="Profile Image">
+            <h2 id="username">Guest</h2>
+            <div id="userActions" style="display:none;">
+                <button id="logoutBtn" class="btn" onclick="logout()">Logout</button>
+            </div>
         </div>
 
         <!-- Bio Section -->
-        <div id="bioSection">
-            <textarea id="bioText" rows="15" cols="50" maxlength="1500" placeholder="Write your bio here (up to 15 lines)..."></textarea>
-            <br>
-            <button id="uploadBioBtn" class="profile-btn hidden-for-visitors" onclick="uploadBio()">Upload Bio</button>
-            <button id="updateBioBtn" class="profile-btn hidden-for-visitors" onclick="updateBio()">Update Bio</button>
-            <div id="bioDisplay">No bio added yet.</div>
+        <div id="bioSection" class="hidden-for-visitors">
+            <textarea id="bioText" rows="5" maxlength="1500" placeholder="Write your bio here..."></textarea>
+            <button id="uploadBioBtn" class="btn hidden-for-visitors" onclick="uploadBio()">Upload Bio</button>
+            <button id="updateBioBtn" class="btn hidden-for-visitors" onclick="updateBio()">Update Bio</button>
+            <div id="bioDisplay"></div>
         </div>
 
-        <!-- Following Profiles -->
+        <!-- Followers and Following Section -->
+        <div id="followersSection">
+            <h3>Followers (<span id="followerCount">0</span>)</h3>
+            <div id="followersList"></div>
+        </div>
+
         <div id="followingSection">
-            <div class="section-title">Following:</div>
-            <div id="followingList" class="profile-list">No following yet.</div>
+            <h3>Following (<span id="followingCount">0</span>)</h3>
+            <div id="followingList"></div>
         </div>
 
-        <!-- Followers Profiles -->
-        <div id="followerSection">
-            <div class="section-title">Followers:</div>
-            <div id="followerList" class="profile-list">No followers yet.</div>
+        <!-- Search and View Profiles Section -->
+        <div id="searchSection">
+            <input type="text" id="searchUsername" placeholder="Search username...">
+            <button onclick="searchUser()">Search</button>
         </div>
 
-        <!-- Logout Button -->
-        <button id="logoutBtn" class="profile-btn hidden-for-visitors" onclick="logout()">Logout</button>
+        <!-- Share Profile Section -->
+        <div id="shareSection">
+            <h3>Share Your Profile</h3>
+            <button onclick="generateShareLink()">Generate Share Link</button>
+            <p id="shareLink"></p>
+        </div>
+
+        <!-- Invite Friends Section -->
+        <div id="inviteSection">
+            <h3>Invite Friends</h3>
+            <button onclick="inviteFriends()">Generate Invite Link</button>
+            <p id="inviteLink"></p>
+        </div>
     </div>
 
     <script>
-        // Load Logged-In User from Local Storage
-        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        const profileOwner = new URLSearchParams(window.location.search).get('username') || loggedInUser?.username;
+        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        let allUsers = JSON.parse(localStorage.getItem('allUsers')) || [];
 
-        // Check if logged in
-        if (!loggedInUser) {
-            window.location.href = 'signup-login.html';  // Redirect to login if not logged in
-        } else {
-            document.getElementById('loggedInUsername').innerText = `Welcome, ${loggedInUser.username}`;
-        }
-
-        // Show or Hide Buttons Based on Ownership
-        function toggleVisitorMode() {
-            if (profileOwner === loggedInUser.username) {
-                // Hide follow button for self
-                document.getElementById('followBtn').style.display = 'none';
-                document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
-                    btn.style.display = 'inline-block';
-                });
+        window.onload = function() {
+            if (loggedInUser) {
+                loadUserProfile();
             } else {
-                // Hide editing options for visitors
-                document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
-                    btn.style.display = 'none';
-                });
+                showVisitorView();
             }
-        }
+        };
 
-        // Load Profile Picture
-        function loadProfilePicture(username) {
-            const storedImage = localStorage.getItem(`profilePic_${username}`);
-            if (storedImage) {
-                document.getElementById('profilePicture').src = storedImage;
-            }
-        }
-
-        // Upload Profile Picture
-        function uploadProfile() {
-            const fileInput = document.getElementById('uploadProfileBtn');
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    localStorage.setItem(`profilePic_${loggedInUser.username}`, e.target.result);
-                    document.getElementById('profilePicture').src = e.target.result;
-                    alert('Profile picture uploaded successfully!');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Load Bio
-        function loadBio(username) {
-            const storedBio = localStorage.getItem(`bio_${username}`);
-            if (storedBio) {
-                document.getElementById('bioDisplay').innerText = storedBio;
-            } else {
-                document.getElementById('bioDisplay').innerText = "No bio added yet.";
-            }
-        }
-
-        // Upload Bio
-        function uploadBio() {
-            const bioContent = document.getElementById('bioText').value.trim();
-            if (bioContent === '') {
-                alert('Bio cannot be empty!');
-                return;
-            }
-            localStorage.setItem(`bio_${loggedInUser.username}`, bioContent);
-            document.getElementById('bioDisplay').innerText = bioContent;
-            alert('Bio uploaded successfully!');
-        }
-
-        // Update Bio
-        function updateBio() {
-            const bioContent = document.getElementById('bioText').value.trim();
-            if (bioContent === '') {
-                alert('Bio cannot be empty!');
-                return;
-            }
-            localStorage.setItem(`bio_${loggedInUser.username}`, bioContent);
-            document.getElementById('bioDisplay').innerText = bioContent;
-            alert('Bio updated successfully!');
-        }
-
-        // Follow / Unfollow User
-        function toggleFollow() {
-            let following = JSON.parse(localStorage.getItem(`following_${loggedInUser.username}`)) || [];
-            let followers = JSON.parse(localStorage.getItem(`followers_${profileOwner}`)) || [];
-
-            if (following.includes(profileOwner)) {
-                // Unfollow user
-                following = following.filter(user => user !== profileOwner);
-                followers = followers.filter(user => user !== loggedInUser.username);
-                alert(`You have unfollowed ${profileOwner}.`);
-            } else {
-                // Follow user
-                following.push(profileOwner);
-                followers.push(loggedInUser.username);
-                alert(`You are now following ${profileOwner}!`);
-            }
-
-            // Update local storage
-            localStorage.setItem(`following_${loggedInUser.username}`, JSON.stringify(following));
-            localStorage.setItem(`followers_${profileOwner}`, JSON.stringify(followers));
+        function loadUserProfile() {
+            document.getElementById('username').innerText = loggedInUser.username;
+            document.getElementById('bioDisplay').innerText = loggedInUser.bio || 'No bio available.';
+            document.getElementById('profileImg').src = loggedInUser.profileImg || 'default.jpg';
+            document.getElementById('userActions').style.display = 'block';
             loadFollowData();
         }
 
-        // Load Follow Data
-        function loadFollowData() {
-            const following = JSON.parse(localStorage.getItem(`following_${loggedInUser.username}`)) || [];
-            const followers = JSON.parse(localStorage.getItem(`followers_${loggedInUser.username}`)) || [];
-
-            // Update following and followers count
-            document.getElementById('followingCount').innerText = following.length;
-            document.getElementById('followerCount').innerText = followers.length;
-
-            // Load following profiles
-            document.getElementById('followingList').innerHTML = following.length > 0
-                ? following.map(user => `<div>${user}</div>`).join('')
-                : 'No following yet.';
-
-            // Load followers profiles
-            document.getElementById('followerList').innerHTML = followers.length > 0
-                ? followers.map(user => `<div>${user}</div>`).join('')
-                : 'No followers yet.';
-
-            // Check if profile owner is being followed
-            if (profileOwner && profileOwner !== loggedInUser.username) {
-                if (following.includes(profileOwner)) {
-                    document.getElementById('followBtn').innerText = 'Unfollow';
-                } else {
-                    document.getElementById('followBtn').innerText = 'Follow';
-                }
-            }
+        function showVisitorView() {
+            document.querySelectorAll('.hidden-for-visitors').forEach(btn => {
+                btn.style.display = 'none';
+            });
+            document.getElementById('logoutBtn').style.display = 'none';
         }
 
-        // Follow/Unfollow Function
-        function toggleFollow() {
-            const following = JSON.parse(localStorage.getItem(`following_${loggedInUser.username}`)) || [];
-            const followers = JSON.parse(localStorage.getItem(`followers_${profileOwner}`)) || [];
-
-            if (following.includes(profileOwner)) {
-                // Unfollow the user
-                const updatedFollowing = following.filter(user => user !== profileOwner);
-                const updatedFollowers = followers.filter(user => user !== loggedInUser.username);
-
-                localStorage.setItem(`following_${loggedInUser.username}`, JSON.stringify(updatedFollowing));
-                localStorage.setItem(`followers_${profileOwner}`, JSON.stringify(updatedFollowers));
-
-                document.getElementById('followBtn').innerText = 'Follow';
-                alert(`You have unfollowed ${profileOwner}`);
-            } else {
-                // Follow the user
-                following.push(profileOwner);
-                followers.push(loggedInUser.username);
-
-                localStorage.setItem(`following_${loggedInUser.username}`, JSON.stringify(following));
-                localStorage.setItem(`followers_${profileOwner}`, JSON.stringify(followers));
-
-                document.getElementById('followBtn').innerText = 'Unfollow';
-                alert(`You are now following ${profileOwner}`);
-            }
-
-            loadFollowData(); // Reload follow data to update UI
+        function uploadBio() {
+            const bio = document.getElementById('bioText').value;
+            loggedInUser.bio = bio;
+            updateUser(loggedInUser);
+            alert('Bio uploaded successfully!');
         }
 
-        // Logout Function
+        function updateBio() {
+            const bio = document.getElementById('bioText').value;
+            loggedInUser.bio = bio;
+            updateUser(loggedInUser);
+            alert('Bio updated successfully!');
+        }
+
         function logout() {
             localStorage.removeItem('loggedInUser');
-            window.location.href = 'signup-login.html'; // Redirect to login after logout
+            alert('Logged out successfully!');
+            window.location.reload();
         }
 
-        // Initial Load
-        window.onload = function () {
-            if (loggedInUser) {
-                loadProfilePicture(profileOwner);
-                loadBio(profileOwner);
-                loadFollowData();
-                toggleVisitorMode();
+        function searchUser() {
+            const username = document.getElementById('searchUsername').value.trim();
+            const foundUser = allUsers.find(user => user.username === username);
+            if (foundUser) {
+                alert('Viewing ' + username + "'s profile as visitor.");
+                window.location.href = `?view=${username}`;
             } else {
-                window.location.href = 'signup-login.html'; // Redirect if not logged in
+                alert('User not found.');
             }
-        };
-   
-    // ===============================
-// Search Bar Section Functions
-// ===============================
+        }
 
-// Load registered usernames from Local CRM Storage
-function loadRegisteredUsers() {
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-    return registeredUsers;
-}
+        function generateShareLink() {
+            const shareLink = `${window.location.href}?view=${loggedInUser.username}`;
+            document.getElementById('shareLink').innerText = shareLink;
+        }
 
-// Search User by Username
-function searchUser() {
-    const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
-    const registeredUsers = loadRegisteredUsers();
-    const searchResultsDiv = document.getElementById('searchResults');
+        function inviteFriends() {
+            const inviteLink = `${window.location.href}?invite=true`;
+            document.getElementById('inviteLink').innerText = inviteLink;
+        }
 
-    if (searchInput === '') {
-        searchResultsDiv.innerHTML = '<p>Please enter a username to search.</p>';
-        return;
-    }
+        function updateUser(user) {
+            const index = allUsers.findIndex(u => u.username === user.username);
+            if (index !== -1) {
+                allUsers[index] = user;
+            } else {
+                allUsers.push(user);
+            }
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+            localStorage.setItem('loggedInUser', JSON.stringify(user));
+            loadUserProfile();
+        }
 
-    const matchedUser = registeredUsers.find(user => user.username.toLowerCase() === searchInput);
+        function loadFollowData() {
+            document.getElementById('followerCount').innerText = loggedInUser.followers ? loggedInUser.followers.length : 0;
+            document.getElementById('followingCount').innerText = loggedInUser.following ? loggedInUser.following.length : 0;
+            displayFollowers();
+            displayFollowing();
+        }
 
-    if (matchedUser) {
-        searchResultsDiv.innerHTML = `
-            <div>
-                <p><strong>Username:</strong> ${matchedUser.username}</p>
-                <button onclick="viewProfile('${matchedUser.username}')">View Profile</button>
-            </div>
-        `;
-    } else {
-        searchResultsDiv.innerHTML = '<p>No user found with that username.</p>';
-    }
-}
+        function displayFollowers() {
+            const followersList = document.getElementById('followersList');
+            followersList.innerHTML = '';
+            (loggedInUser.followers || []).forEach(follower => {
+                followersList.innerHTML += `<div class="profile-item">${follower}</div>`;
+            });
+        }
 
-// Redirect to View Profile as Visitor
-function viewProfile(username) {
-    localStorage.setItem('profileOwner', username);
-    window.location.href = 'dashboard.html'; // Redirect to the profile page as a visitor
-}
+        function displayFollowing() {
+            const followingList = document.getElementById('followingList');
+            followingList.innerHTML = '';
+            (loggedInUser.following || []).forEach(following => {
+                followingList.innerHTML += `<div class="profile-item">${following}</div>`;
+            });
+        }
 
-// Store New Usernames in Local CRM Storage
-function storeRegisteredUser(username) {
-    let registeredUsers = loadRegisteredUsers();
-    
-    // Avoid duplicating usernames
-    if (!registeredUsers.some(user => user.username === username)) {
-        registeredUsers.push({ username });
-        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-    }
-}
-
-
-        
     </script>
 </body>
 </html>
