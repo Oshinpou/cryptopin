@@ -68,8 +68,15 @@
         function addUser() {
             const username = document.getElementById('username').value.trim();
             const email = document.getElementById('email').value.trim();
+            
             if (!username || !email) {
                 alert('Please enter a valid username and email.');
+                return;
+            }
+
+            // Check if username already exists
+            if (users.some(user => user.username === username)) {
+                alert('Username already exists. Please choose a different one.');
                 return;
             }
 
@@ -83,17 +90,17 @@
             alert('User added successfully!');
         }
 
-        // Generate unique profile code
+        // Generate unique code for profile
         function generateUniqueCode() {
             return `CP-${Math.floor(100000 + Math.random() * 900000)}`;
         }
 
-        // Generate correct profile link (without HTML extension)
+        // Generate unique profile link
         function generateProfileLink(code) {
-            return `${window.location.origin}/?code=${code}`;
+            return `${window.location.origin}/profile.html?code=${code}`;
         }
 
-        // Load and display users
+        // Load users and display in admin panel
         function loadUsers() {
             const userList = document.getElementById('userList');
             if (users.length === 0) {
@@ -109,7 +116,7 @@
             `).join('');
         }
 
-        // Delete user and update local storage
+        // Delete user and update list
         function deleteUser(index) {
             users.splice(index, 1);
             localStorage.setItem('users', JSON.stringify(users));
